@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum NetworkError: Error {
+public enum NetworkError: Error {
 
     case NotRecognized
     case NoError200
