@@ -10,26 +10,15 @@ import Foundation
 
 public struct Client {
     
-    enum RequestMethod {
-        
-        case GET, POST
-    }
-    
-    fileprivate(set) var configuration: SessionConfiguration
-    fileprivate(set) var method: RequestMethod
-    fileprivate(set) var parameters: [String:String]?
+    fileprivate(set) var configuration: Configuration
     
     @available(*, unavailable)
     init() {
         fatalError()
     }
     
-    init?(configuration: SessionConfiguration,
-          method: RequestMethod = .GET,
-          parameters: [String:String]? = nil) {
+    init?(configuration: Configuration) {
         
         self.configuration = configuration
-        self.method = method
-        self.parameters = parameters
     }
 }
