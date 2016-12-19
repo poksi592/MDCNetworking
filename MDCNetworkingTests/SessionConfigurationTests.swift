@@ -1,5 +1,5 @@
 //
-//  SessionConfigurationTests.swift
+//  ConfigurationTests.swift
 //  MDCNetworking
 //
 //  Created by Despotovic, Mladen on 19/12/2016.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import MDCNetworking
 
-class SessionConfigurationTests: XCTestCase {
+class ConfigurationTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -24,21 +24,31 @@ class SessionConfigurationTests: XCTestCase {
     func testInstantiation() {
         
         // Designated initializer
-        let session1 = SessionConfiguration(host: "https://somehost")
+        let session1 = Configuration(host: "https://somehost")
         XCTAssertNotNil(session1)
         XCTAssertEqual(session1?.host.description, "https://somehost")
         
         // Additional headers
-        let session2 = SessionConfiguration(host: "https://somehost",
+        let session2 = Configuration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"])
         XCTAssertNotNil(session2)
         XCTAssertEqual(session2?.additionalHeaders?.count, 2)
         
         // Timeout
-        let session3 = SessionConfiguration(host: "https://somehost",
+        let session3 = Configuration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"], timeout: 20)
         XCTAssertNotNil(session3)
         XCTAssertEqual(session3?.timeout, 20)
+        
+        // Session configuration
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30
+        let session4 = Configuration(host: "https://somehost",
+                                            additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
+                                            timeout: 20,
+                                            sessionConfiguration: configuration)
+        XCTAssertNotNil(session4)
+        XCTAssertEqual(session4?.sessionConfiguration.timeoutIntervalForRequest, 30)
     }
     
 
