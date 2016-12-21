@@ -11,6 +11,7 @@ import Foundation
 public enum NetworkError: Error {
 
     case NotRecognized
+    case NoConfiguration
     case NoError200
     case NoError201
     case NoError204

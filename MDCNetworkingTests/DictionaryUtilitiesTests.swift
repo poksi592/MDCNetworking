@@ -7,8 +7,9 @@
 //
 
 import XCTest
+@testable import MDCNetworking
 
-class StringUtilitiesTests: XCTestCase {
+class DictionaryUtilitiesTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -20,16 +21,49 @@ class StringUtilitiesTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testURLParameters() {
+        
+        // Empty string
+        var parameters = [String : String]()
+        var string = parameters.URLParameters()
+        XCTAssertEqual(string, "")
+
+        // Single parameter
+        parameters = ["key": "value"]
+        string = parameters.URLParameters()
+        XCTAssertEqual(string, "key=value")
+        
+        // Two parameters
+        parameters = ["key": "value","key1": "value"]
+        string = parameters.URLParameters()
+        XCTAssertEqual(string, "key=value&key1=value")
+        
+        // Remove % encodings if it exist and add again
+        parameters = ["one%26two": "%20%3Dthree"]
+        string = parameters.URLParameters()
+        XCTAssertEqual(string, "one%26two=%20%3Dthree")
+        
+        // Add % encoding
+        parameters = ["one& ": "three"]
+        string = parameters.URLParameters()
+        XCTAssertEqual(string, "one%26%20=three")
+        
+        // Test Integers as well
+        var parametersInt = [String : Int]()
+        parametersInt = ["key": 1]
+        string = parametersInt.URLParameters()
+        XCTAssertEqual(string, "key=1")
+        
+        // Test Floats as well
+        var parametersFloat = [String : Float]()
+        parametersFloat = ["key": 1.1]
+        string = parametersFloat.URLParameters()
+        XCTAssertEqual(string, "key=1%2E1")
+        
+        // Test Double as well
+        var parametersDouble = [String : Double]()
+        parametersDouble = ["key": 1.9384756]
+        string = parametersDouble.URLParameters()
+        XCTAssertEqual(string, "key=1%2E9384756")
     }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-    
 }
