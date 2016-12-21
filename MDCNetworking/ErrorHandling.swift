@@ -21,16 +21,12 @@ public enum NetworkError: Error {
     case NotFound404(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?)
     case ServerError500(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?)
     
-    init(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?) {
+    init?(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?) {
         
         switch response.statusCode {
           
-        case 200:
-            self = .NoError200
-        case 201:
-            self = .NoError201
-        case 204:
-            self = .NoError204
+        case 200..<300:
+            return nil
         case 400:
             self = .BadRequest400(error: error, response: response, serverErrorPayload: serverErrorPayload)
         case 401:
