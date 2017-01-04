@@ -32,7 +32,7 @@ class SessionTests: XCTestCase {
         }
     }
     
-    func testStartSession() {
+    func testJSONSessionNoConfiguration() {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
@@ -48,6 +48,28 @@ class SessionTests: XCTestCase {
             expectationForTest.fulfill()
         }
         XCTAssertNotNil(session1)
+        session1.start()
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    func testJSONSessionBadRequest() {
+        
+        // Prepare without Configuration object set
+        let expectationForTest = expectation(description: "test")
+        let configuration = Configuration(host: "https://somehost")
+        // Execute and test
+        var session1 = JSONSession(requestURLPath: "https://somehost") { (result, response, error, cancelled) in
+            
+            XCTAssertNotNil(error)
+            let error = error! as NetworkError
+            guard case .BadRequest400 = error else {
+                XCTAssertTrue(false, "error")
+                return
+            }
+            expectationForTest.fulfill()
+        }
+        XCTAssertNotNil(session1)
+        session1.configuration = configuration
         session1.start()
         waitForExpectations(timeout: 5, handler: nil)
     }

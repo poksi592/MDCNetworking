@@ -15,7 +15,7 @@ enum HTTPMethodName: String {
 }
 
 
-typealias RequestCompletion = (Any?, URLResponse, NetworkError?, _ cancelled: Bool) -> Void
+typealias RequestCompletion = (Any?, HTTPURLResponse, NetworkError?, _ cancelled: Bool) -> Void
 
 protocol CancelableSession {
     
@@ -37,7 +37,7 @@ protocol CancelableSession {
 struct JSONSession: CancelableSession {
     
     internal(set) var completion: RequestCompletion
-    internal(set) var configuration: Configuration?
+    var configuration: Configuration?
     internal(set) var requestURLPath: String
     internal(set) var HTTPMethod: HTTPMethodName
     internal(set) var additionalHeaders: [String:String] = [:]
@@ -68,49 +68,50 @@ struct JSONSession: CancelableSession {
         
         guard let configuration = configuration else {
             
-            completion(nil, URLResponse(), .NoConfiguration, false)
+            completion(nil, HTTPURLResponse(), .NoConfiguration, false)
             return
         }
         
         guard let request = configuration.request(path: requestURLPath, parameters: parameters) else { return }
         let session = URLSession.init(configuration: configuration.sessionConfiguration)
-        let task = session.dataTask(with: request) { (data, response, error) in
-            
-        }
+        let task = session.dataTask(with: request, completionHandler: dataTaskClosure() as! (Data?, URLResponse?, Error?) -> Void)
+        task.resume()
         
     }
+    
+    func dataTaskClosure() -> (Data?, URLResponse, Error?) -> Void {
+        
+        return { (data, response, error) in
+            
+            var responseObject: [String: String]? = nil
+            var networkingError: NetworkError? = nil
+            if let data = data {
+                
+                do {
+                    
+                    responseObject = try JSONSerialization.jsonObject(with: data,
+                                                                      options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: String]
+                }
+                catch {
+                    
+                    networkingError = NetworkError.SerialisationFailed
+                }
+            }
+            
+            if let error = error {
+
+                if let data = data {
+                    
+                    responseObject = try? JSONSerialization.jsonObject(with: data,
+                                                                       options: JSONSerialization.ReadingOptions.mutableContainers) as! [String: String]
+                }
+                networkingError = NetworkError(error: error,
+                                               response: response as! HTTPURLResponse,
+                                               serverErrorPayload: responseObject)
+            }
+            self.completion(responseObject, response as! HTTPURLResponse, networkingError, false)
+        }
+    }
+
 }
-
-
-
-
-/*
- //    var sessionRequest:URLRequest? {get}
- var configuration: Configuration {get}
- var sessionConfiguration:URLSessionConfiguration {get}
- var session:URLSession? {get}
- 
- init(URL:URL,
- paramNetworkingConfiguration:NetworkingConfiguration,
- paramHTTPMethodString:HTTPMethodName,
- paramRequestParamaters:Dictionary<String,String>?,
- paramCompletionClosure:RequestCompletion,
- paramProgressClosure:RequestProgress?)
- 
- func setHeaders(_ headers:Dictionary<String,String>) -> ()
- func cancel() -> ()
- func startSession() -> ()
-
-
-fileprivate(set) var method: HTTPMethodName
-fileprivate(set) var parameters: [String:String]?
-
-
-method: HTTPMethodName = .GET,
-parameters: [String:String]? = nil
-
-self.method = method
-self.parameters = parameters
- 
- */
 

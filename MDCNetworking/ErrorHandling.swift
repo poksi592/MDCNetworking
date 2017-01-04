@@ -12,9 +12,7 @@ public enum NetworkError: Error {
 
     case NotRecognized
     case NoConfiguration
-    case NoError200
-    case NoError201
-    case NoError204
+    case SerialisationFailed
     case BadRequest400(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?)
     case Unauthorized401(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?)
     case Forbidden403(error: Error?, response: HTTPURLResponse, serverErrorPayload: [String:String]?)
