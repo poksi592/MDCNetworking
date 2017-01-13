@@ -1,0 +1,11 @@
+{
+    "baseUrl": "https://euapi.ibm.xtify.com/3.0/",
+    "appKey": {
+        "dev":"apZbN1JXN9",
+        "prod":"apB6jCIdSz"
+    },
+    "appDelegateClass": "TDAAppDelegate",
+    "autoInitializeFlag": true,
+    "sessionTimeout": 20,
+    "metricTimeInterval": 180
+}

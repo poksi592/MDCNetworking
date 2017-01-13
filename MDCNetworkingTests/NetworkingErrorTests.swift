@@ -32,7 +32,7 @@ class NetworkingErrorTests: XCTestCase {
         let networkError400 = NetworkError(error: nil, response: mockedResponse400!, serverErrorPayload: nil)
         // Test and execute
         if case .BadRequest400(_, let response, _) = networkError400! {
-            XCTAssertEqual(response.statusCode, 400)
+            XCTAssertEqual(response?.statusCode, 400)
         }
         else {
             XCTAssertTrue(false, "error")
@@ -47,7 +47,7 @@ class NetworkingErrorTests: XCTestCase {
         let networkError401 = NetworkError(error: nil, response: mockedResponse401!, serverErrorPayload: nil)
         // Test and execute
         if case .Unauthorized401(_, let response, _) = networkError401! {
-            XCTAssertEqual(response.statusCode, 401)
+            XCTAssertEqual(response?.statusCode, 401)
         }
         else {
             XCTAssertTrue(false, "error")
@@ -62,7 +62,7 @@ class NetworkingErrorTests: XCTestCase {
         let networkError403 = NetworkError(error: nil, response: mockedResponse403!, serverErrorPayload: nil)
         // Test and execute
         if case .Forbidden403(_, let response, _) = networkError403! {
-            XCTAssertEqual(response.statusCode, 403)
+            XCTAssertEqual(response?.statusCode, 403)
         }
         else {
             XCTAssertTrue(false, "error")
@@ -77,7 +77,7 @@ class NetworkingErrorTests: XCTestCase {
         let networkError404 = NetworkError(error: nil, response: mockedResponse404!, serverErrorPayload: nil)
         // Test and execute
         if case .NotFound404(_, let response, _) = networkError404! {
-            XCTAssertEqual(response.statusCode, 404)
+            XCTAssertEqual(response?.statusCode, 404)
         }
         else {
             XCTAssertTrue(false, "error")
@@ -95,7 +95,7 @@ class NetworkingErrorTests: XCTestCase {
         let networkError500 = NetworkError(error: nil, response: mockedResponse500!, serverErrorPayload: nil)
         // Test and execute
         if case .ServerError500(_, let response, _) = networkError500! {
-            XCTAssertEqual(response.statusCode, 500)
+            XCTAssertEqual(response?.statusCode, 500)
         }
         else {
             XCTAssertTrue(false, "error")
@@ -146,25 +146,6 @@ class NetworkingErrorTests: XCTestCase {
     }
 }
 
-class MockedHTTPURLResponseErrorHandling: HTTPURLResponse {
-    
-    var mockedStatusCode: Int
-    
-    override init?(url: URL, statusCode: Int, httpVersion HTTPVersion: String?, headerFields: [String : String]?) {
-        
-        self.mockedStatusCode = statusCode
-        super.init(url: url, mimeType: "wefwef", expectedContentLength: 10, textEncodingName: nil)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override var statusCode:Int  {
-        
-        return mockedStatusCode
-    }
-}
 
 
 

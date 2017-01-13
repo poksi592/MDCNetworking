@@ -24,7 +24,9 @@ class SessionTests: XCTestCase {
     func testInitialising() {
     
         // Test with default GET method
-        let session1 = JSONSession(requestURLPath: "https://somehost") { (result, response, error, cancelled) in }
+        let configuration = Configuration(host: "http://api.timezonedb.com/")
+        let session1 = JSONSession(requestURLPath: "https://somehost",
+                                   configuration: configuration!) { (result, response, error, cancelled) in }
         XCTAssertNotNil(session1)
         guard case .GET = session1.HTTPMethod else {
             XCTAssert(false, "error")
@@ -32,82 +34,134 @@ class SessionTests: XCTestCase {
         }
     }
     
-    func testJSONSessionNoConfiguration() {
+    func test_CallToTimezoneAPI() {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
+        let configuration = Configuration(host: "http://api.timezonedb.com/")
+        let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         // Execute and test
-        let session1 = JSONSession(requestURLPath: "https://somehost") { (result, response, error, cancelled) in
-            
-            XCTAssertNotNil(error)
-            let error = error! as NetworkError
-            guard case .NoConfiguration = error else {
-                XCTAssertTrue(false, "error")
-                return
-            }
-            expectationForTest.fulfill()
+        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   HTTPMethod: HTTPMethodName.GET,
+                                   parameters: parameters,
+                                   configuration: configuration!) { (result, response, error, cancelled) in
+                                    
+                                    XCTAssertNil(error)
+                                    let resultDictionary = result as! [String: Any]
+                                    let zones = resultDictionary["zones"] as! [[String: Any]]
+                                    let firstZone = zones.first!
+                                    XCTAssertEqual(firstZone["countryCode"] as! String, "GB")
+                                    expectationForTest.fulfill()
         }
         XCTAssertNotNil(session1)
+        session1.configuration = configuration!
         session1.start()
         waitForExpectations(timeout: 5, handler: nil)
     }
     
-    func testJSONSessionBadRequest() {
+    func test_InjectStubbedResponse() {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = Configuration(host: "https://somehost")
+        let configuration = Configuration(host: "http://api.timezonedb.com/")
+        let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
+        
+        // Prepare stubbed session
+        let stubbedSession = StubbedURLSession()
+        let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
+        stubbedSession.addStub(fullURL:"http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json&country=GB",
+                               response:responseString)
+        
         // Execute and test
-        var session1 = JSONSession(requestURLPath: "https://somehost") { (result, response, error, cancelled) in
-            
-            XCTAssertNotNil(error)
-            let error = error! as NetworkError
-            guard case .BadRequest400 = error else {
-                XCTAssertTrue(false, "error")
-                return
-            }
-            expectationForTest.fulfill()
+        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   HTTPMethod: HTTPMethodName.GET,
+                                   parameters: parameters,
+                                   configuration: configuration!,
+                                   session: stubbedSession) { (result, response, error, cancelled) in
+                                    
+                                    XCTAssertNil(error)
+                                    let resultDictionary = result as! [String: Any]
+                                    let zones = resultDictionary["zones"] as! [[String: Any]]
+                                    let firstZone = zones.first!
+                                    XCTAssertEqual(firstZone["countryCode"] as! String, "UK")
+                                    expectationForTest.fulfill()
         }
         XCTAssertNotNil(session1)
-        session1.configuration = configuration
+        session1.session = stubbedSession
         session1.start()
         waitForExpectations(timeout: 5, handler: nil)
     }
-
     
+    func test_InjectTwoStubbedResponses() {
+        
+        // Prepare without Configuration object set
+        let expectationForTest = expectation(description: "test")
+        let configuration = Configuration(host: "http://api.timezonedb.com/")
+        let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
+        
+        // Prepare stubbed session
+        let stubbedSession = StubbedURLSession()
+        let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
+        stubbedSession.addStub(fullURL:"http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json&country=GB",
+                               response:responseString)
+        // Stubbed session with one missing parameter, therefore not valid
+        stubbedSession.addStub(fullURL:"http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json",
+                               response:responseString)
+        
+        // Execute and test
+        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   HTTPMethod: HTTPMethodName.GET,
+                                   parameters: parameters,
+                                   configuration: configuration!,
+                                   session: stubbedSession) { (result, response, error, cancelled) in
+                                    
+                                    XCTAssertNil(error)
+                                    let resultDictionary = result as! [String: Any]
+                                    let zones = resultDictionary["zones"] as! [[String: Any]]
+                                    let firstZone = zones.first!
+                                    XCTAssertEqual(firstZone["countryCode"] as! String, "UK")
+                                    expectationForTest.fulfill()
+        }
+        XCTAssertNotNil(session1)
+        session1.session = stubbedSession
+        session1.start()
+        waitForExpectations(timeout: 5, handler: nil)
+    }
     
-    
+    func test_InjectNotValidStubbedResponse() {
+        
+        // Prepare without Configuration object set
+        let expectationForTest = expectation(description: "test")
+        let configuration = Configuration(host: "http://api.timezonedb.com/")
+        let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
+        
+        // Prepare stubbed session
+        let stubbedSession = StubbedURLSession()
+        let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
+        // Stubbed session with one missing parameter, therefore not valid
+        stubbedSession.addStub(fullURL:"http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json",
+                               response:responseString)
+        
+        // Execute and test
+        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   HTTPMethod: HTTPMethodName.GET,
+                                   parameters: parameters,
+                                   configuration: configuration!,
+                                   session: stubbedSession) { (result, response, error, cancelled) in
+                                    
+                                    XCTAssertNotNil(error)
+                                    guard case .BadRequest400 = error! else {
+                                        XCTAssertTrue(false, "error")
+                                        return
+                                    }
+                                    
+                                    expectationForTest.fulfill()
+        }
+        XCTAssertNotNil(session1)
+        session1.session = stubbedSession
+        session1.start()
+        waitForExpectations(timeout: 5, handler: nil)
+    }
 }
 
-/*
- // Test with GET method
- let session2 = Configuration(host: "https://somehost")
- let client2 = Client(configuration: session2!, method: .GET)
- XCTAssertNotNil(client2)
- guard case .GET = client2!.method else {
- XCTAssert(false, "error")
- return
- }
- 
- // Test with POST method
- let session3 = Configuration(host: "https://somehost")
- let client3 = Client(configuration: session3!, method: .POST)
- XCTAssertNotNil(client3)
- guard case .POST = client3!.method else {
- XCTAssert(false, "error")
- return
- }
- 
- // Test with parameters
- let session4 = Configuration(host: "https://somehost")
- let client4 = Client(configuration: session4!,
- method: .POST,
- parameters: ["par1":"value1","par2":"value2"])
- XCTAssertNotNil(client4)
- guard case .POST = client4!.method,
- let _ = client4?.parameters else {
- XCTAssert(false, "error")
- return
- }
- */
 
