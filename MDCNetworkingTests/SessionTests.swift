@@ -28,7 +28,7 @@ class SessionTests: XCTestCase {
         let session1 = JSONSession(requestURLPath: "https://somehost",
                                    configuration: configuration!) { (result, response, error, cancelled) in }
         XCTAssertNotNil(session1)
-        guard case .GET = session1.HTTPMethod else {
+        guard case .get = session1.httpMethod else {
             XCTAssert(false, "error")
             return
         }
@@ -41,8 +41,8 @@ class SessionTests: XCTestCase {
         let configuration = Configuration(host: "http://api.timezonedb.com/")
         let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         // Execute and test
-        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
-                                   HTTPMethod: HTTPMethodName.GET,
+        let session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   httpMethod: .get,
                                    parameters: parameters,
                                    configuration: configuration!) { (result, response, error, cancelled) in
                                     
@@ -55,7 +55,13 @@ class SessionTests: XCTestCase {
         }
         XCTAssertNotNil(session1)
         session1.configuration = configuration!
-        session1.start()
+        
+        do {
+            try session1.start()
+        } catch {
+            XCTFail("Session didn't start")
+        }
+        
         waitForExpectations(timeout: 5, handler: nil)
     }
     
@@ -73,8 +79,8 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
-                                   HTTPMethod: HTTPMethodName.GET,
+        let session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   httpMethod: .get,
                                    parameters: parameters,
                                    configuration: configuration!,
                                    session: stubbedSession) { (result, response, error, cancelled) in
@@ -88,7 +94,13 @@ class SessionTests: XCTestCase {
         }
         XCTAssertNotNil(session1)
         session1.session = stubbedSession
-        session1.start()
+        
+        do {
+            try session1.start()
+        } catch {
+            XCTFail("Session didn't start")
+        }
+        
         waitForExpectations(timeout: 5, handler: nil)
     }
     
@@ -109,8 +121,8 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
-                                   HTTPMethod: HTTPMethodName.GET,
+        let session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   httpMethod: .get,
                                    parameters: parameters,
                                    configuration: configuration!,
                                    session: stubbedSession) { (result, response, error, cancelled) in
@@ -124,7 +136,13 @@ class SessionTests: XCTestCase {
         }
         XCTAssertNotNil(session1)
         session1.session = stubbedSession
-        session1.start()
+        
+        do {
+            try session1.start()
+        } catch {
+            XCTFail("Could not start session.")
+        }
+        
         waitForExpectations(timeout: 5, handler: nil)
     }
     
@@ -143,14 +161,14 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        var session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
-                                   HTTPMethod: HTTPMethodName.GET,
+        let session1 = JSONSession(requestURLPath: "/v2/list-time-zone",
+                                   httpMethod: .get,
                                    parameters: parameters,
                                    configuration: configuration!,
                                    session: stubbedSession) { (result, response, error, cancelled) in
                                     
                                     XCTAssertNotNil(error)
-                                    guard case .BadRequest400 = error! else {
+                                    guard case .badRequest400 = error! else {
                                         XCTAssertTrue(false, "error")
                                         return
                                     }
@@ -158,8 +176,15 @@ class SessionTests: XCTestCase {
                                     expectationForTest.fulfill()
         }
         XCTAssertNotNil(session1)
+        
         session1.session = stubbedSession
-        session1.start()
+        
+        do {
+            try session1.start()
+        } catch {
+            XCTFail("Could not start session.")
+        }
+        
         waitForExpectations(timeout: 5, handler: nil)
     }
 }

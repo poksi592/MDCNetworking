@@ -71,7 +71,7 @@ extension CancelableSession {
         
         if let session = session {
             session.invalidateAndCancel()
-            completion(nil, HTTPURLResponse(), .TaskCancelled, false)
+            completion(nil, HTTPURLResponse(), .taskCancelled, false)
         }
     }
 }
@@ -125,11 +125,11 @@ public class JSONSession: NSObject, CancelableSession {
                 do {
                     
                     responseObject = try JSONSerialization.jsonObject(with: data,
-                                                                      options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: Any]
+                                                                      options: .mutableContainers) as? [String: Any]
                 }
                 catch {
                     
-                    networkingError = NetworkError.SerialisationFailed
+                    networkingError = .serializationFailed
                 }
             }
             
@@ -138,7 +138,7 @@ public class JSONSession: NSObject, CancelableSession {
                 if let data = data {
                     
                     responseObject = try? JSONSerialization.jsonObject(with: data,
-                                                                       options: JSONSerialization.ReadingOptions.mutableContainers) as! [String: Any]
+                                                                       options: .mutableContainers) as! [String: Any]
                 }
                 networkingError = NetworkError(error: error,
                                                response: response as? HTTPURLResponse,

@@ -55,20 +55,20 @@ class ConfigurationTests: XCTestCase {
         
         // basic request
         var session = Configuration(host: "https://somehost")
-        var request = session!.request(path: "https://somehost", parameters: nil)
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost")
+        var request = try! session!.request(path: "path", parameters: nil)
+
+        XCTAssertEqual(request.description, "https://somehost/path")
         
         // Single parameter
         session = Configuration(host: "https://somehost")
-        request = session!.request(path: "https://somehost", parameters: ["parameter": "value"])
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost?parameter=value")
+        request = try! session!.request(path: "path", parameters: ["parameter": "value"])
+        
+        XCTAssertEqual(request.description, "https://somehost/path?parameter=value")
         
         // Two parameters
         session = Configuration(host: "https://somehost")
-        request = session!.request(path: "https://somehost", parameters: ["parameter": "value", "parameter1": "value1"])
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost?parameter=value&parameter1=value1")
+        request = try! session!.request(path: "path", parameters: ["parameter": "value", "parameter1": "value1"])
+        
+        XCTAssertEqual(request.description, "https://somehost/path?parameter=value&parameter1=value1")
     }
 }
