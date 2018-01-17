@@ -9,47 +9,63 @@
 import Foundation
 
 public struct Configuration {
+    
+    public struct UrlConstructionError: Error {}
+    public struct PathPercentEncodingError: Error {}
 
-    fileprivate(set) var host: URL
-    fileprivate(set) var additionalHeaders: [String:String]
-    fileprivate(set) var timeout: TimeInterval
-    fileprivate(set) var sessionConfiguration: URLSessionConfiguration
+    private (set) var host: URL
+    private (set) var additionalHeaders: [String:String]
+    private (set) var timeout: TimeInterval
+    private (set) var sessionConfiguration: URLSessionConfiguration
+    private (set) var certificatesPathsForResource: [String]?
     
     @available(*, unavailable)
     init() {
         fatalError()
     }
     
-    init?(host: String,
-          additionalHeaders: [String:String]? = nil,
-          timeout: TimeInterval = 60,
-          sessionConfiguration: URLSessionConfiguration = URLSessionConfiguration.default) {
+    public init?(
+        host: String,
+        additionalHeaders: [String: String]? = nil,
+        timeout: TimeInterval = 60,
+        sessionConfiguration: URLSessionConfiguration = .default,
+        certificatesPathsForResource: [String]? = nil
+    ) {
+        guard let host = URL(string: host) else {
+            return nil
+        }
         
-        guard let host = URL(string: host) else { return nil }
         self.host = host
         self.additionalHeaders = additionalHeaders ?? [:]
         self.timeout = timeout
         self.sessionConfiguration = sessionConfiguration
-        self.sessionConfiguration.timeoutIntervalForRequest = self.timeout
+        self.sessionConfiguration.timeoutIntervalForRequest = timeout
+        self.certificatesPathsForResource = certificatesPathsForResource
     }
-}
-
-public extension Configuration {
     
-    func request(path: String, parameters: [String : String]?) -> URLRequest? {
+    func request(path: String, parameters: [String: String]?) throws -> URLRequest {
         
-        let fullMethodPath: String
+        guard let percentEncodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            throw PathPercentEncodingError()
+        }
+        
+        let expandedPath: String
         if let parametersString = parameters?.URLParameters() {
-            
-            fullMethodPath = path + "?" + parametersString
+            expandedPath = percentEncodedPath + "?" + parametersString
+        } else {
+            expandedPath = percentEncodedPath
         }
-        else {
-            
-            fullMethodPath = path
-        }
-        guard let requestURL = URL.init(string: fullMethodPath, relativeTo: host) else { return nil }
         
-        let request = URLRequest(url: requestURL)
+        guard let requestURL = URL(string: expandedPath, relativeTo: host) else {
+            throw UrlConstructionError()
+        }
+        
+        var request = URLRequest(url: requestURL)
+        
+        for (key, value) in additionalHeaders {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+        
         return request
     }
 }
