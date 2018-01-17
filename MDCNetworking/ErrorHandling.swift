@@ -17,23 +17,20 @@ public enum NetworkError: Error {
     case Unauthorized401(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?)
     case Forbidden403(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?)
     case NotFound404(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?)
+    case other400(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?)
     case ServerError500(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?)
     
     init?(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String:Any]?) {
         
         let responseCode: Int
         if let response = response {
-            
             responseCode = response.statusCode
-        }
-        else {
-            
+        } else {
             responseCode = 0
             self = .NotRecognized
         }
         
         switch responseCode {
-                
             case 200..<300:
                 return nil
             case 400:
@@ -44,6 +41,8 @@ public enum NetworkError: Error {
                 self = .Forbidden403(error: error, response: response, serverErrorPayload: serverErrorPayload)
             case 404:
                 self = .NotFound404(error: error, response: response, serverErrorPayload: serverErrorPayload)
+            case 405..<500:
+                self = .other400(error: error, response: response, serverErrorPayload: serverErrorPayload)
             case 500..<600:
                 self = .ServerError500(error: error, response: response, serverErrorPayload: serverErrorPayload)
             default:

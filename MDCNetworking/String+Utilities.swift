@@ -11,7 +11,6 @@ import Foundation
 extension String {
     
     func URLEncodedString() -> String {
-        
-        return self.removingPercentEncoding?.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? ""
+        return removingPercentEncoding?.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? ""
     }
 }

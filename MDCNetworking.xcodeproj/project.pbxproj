@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60300C46200F78DD00AF7A0A /* Pact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C45200F78DD00AF7A0A /* Pact.swift */; };
+		60300C48200F792800AF7A0A /* DynamicCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C47200F792800AF7A0A /* DynamicCoding.swift */; };
+		60300C4A200F797700AF7A0A /* PactStubbedURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C49200F797700AF7A0A /* PactStubbedURLSession.swift */; };
+		60300C4C200F7A1E00AF7A0A /* URL+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C4B200F7A1E00AF7A0A /* URL+Utilities.swift */; };
 		6D398AFC1E254B7F005A67E7 /* Test1.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D398AFB1E254B7F005A67E7 /* Test1.json */; };
 		6DA77EF51E02FEA800D3E3B1 /* MDCNetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DA77EEB1E02FEA800D3E3B1 /* MDCNetworking.framework */; };
 		6DA77EFC1E02FEA800D3E3B1 /* MDCNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -36,6 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		60300C45200F78DD00AF7A0A /* Pact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pact.swift; sourceTree = "<group>"; };
+		60300C47200F792800AF7A0A /* DynamicCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicCoding.swift; sourceTree = "<group>"; };
+		60300C49200F797700AF7A0A /* PactStubbedURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PactStubbedURLSession.swift; sourceTree = "<group>"; };
+		60300C4B200F7A1E00AF7A0A /* URL+Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Utilities.swift"; sourceTree = "<group>"; };
 		6D398AFB1E254B7F005A67E7 /* Test1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Test1.json; sourceTree = "<group>"; };
 		6DA77EEB1E02FEA800D3E3B1 /* MDCNetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MDCNetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDCNetworking.h; sourceTree = "<group>"; };
@@ -76,6 +84,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60300C44200F78C800AF7A0A /* Pact */ = {
+			isa = PBXGroup;
+			children = (
+				60300C45200F78DD00AF7A0A /* Pact.swift */,
+				60300C49200F797700AF7A0A /* PactStubbedURLSession.swift */,
+			);
+			path = Pact;
+			sourceTree = "<group>";
+		};
 		6DA77EE11E02FEA800D3E3B1 = {
 			isa = PBXGroup;
 			children = (
@@ -97,15 +114,18 @@
 		6DA77EED1E02FEA800D3E3B1 /* MDCNetworking */ = {
 			isa = PBXGroup;
 			children = (
+				60300C44200F78C800AF7A0A /* Pact */,
 				6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */,
 				6DA77EEF1E02FEA800D3E3B1 /* Info.plist */,
 				6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */,
 				6DA77F091E07E06E00D3E3B1 /* Configuration.swift */,
 				6DA77F0F1E0802B500D3E3B1 /* Client.swift */,
 				6DA77F111E08250400D3E3B1 /* Session.swift */,
+				60300C47200F792800AF7A0A /* DynamicCoding.swift */,
+				6DA77F1D1E1FF34100D3E3B1 /* StubbedURLSession.swift */,
 				6DA77F151E092DF300D3E3B1 /* Dictionary+Utilities.swift */,
 				6DA77F191E09543D00D3E3B1 /* String+Utilities.swift */,
-				6DA77F1D1E1FF34100D3E3B1 /* StubbedURLSession.swift */,
+				60300C4B200F7A1E00AF7A0A /* URL+Utilities.swift */,
 			);
 			path = MDCNetworking;
 			sourceTree = "<group>";
@@ -237,11 +257,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60300C4A200F797700AF7A0A /* PactStubbedURLSession.swift in Sources */,
 				6DA77F161E092DF300D3E3B1 /* Dictionary+Utilities.swift in Sources */,
 				6DA77F1A1E09543D00D3E3B1 /* String+Utilities.swift in Sources */,
+				60300C48200F792800AF7A0A /* DynamicCoding.swift in Sources */,
+				60300C4C200F7A1E00AF7A0A /* URL+Utilities.swift in Sources */,
 				6DA77F121E08250400D3E3B1 /* Session.swift in Sources */,
 				6DA77F0A1E07E06E00D3E3B1 /* Configuration.swift in Sources */,
 				6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */,
+				60300C46200F78DD00AF7A0A /* Pact.swift in Sources */,
 				6DA77F101E0802B500D3E3B1 /* Client.swift in Sources */,
 				6DA77F1E1E1FF34100D3E3B1 /* StubbedURLSession.swift in Sources */,
 			);

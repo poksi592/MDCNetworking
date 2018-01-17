@@ -37,11 +37,11 @@ public protocol CancelableSession: URLSessionDelegate {
     
     init(
         requestURLPath: String,
-        httpMethod: HTTPMethod = .get,
-        parameters: [String: String]? = nil,
-        httpBody: Data? = nil,
+        httpMethod: HTTPMethod,
+        parameters: [String: String]?,
+        httpBody: Data?,
         configuration: Configuration,
-        session: URLSession? = nil,
+        session: URLSession?,
         completion: @escaping RequestCompletion
     )
     
