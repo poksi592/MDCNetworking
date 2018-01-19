@@ -18,12 +18,7 @@ public struct NetworkConfiguration {
     private (set) var timeout: TimeInterval
     private (set) var sessionConfiguration: URLSessionConfiguration
     private (set) var certificatesPathsForResource: [String]?
-    
-    @available(*, unavailable)
-    init() {
-        fatalError()
-    }
-    
+
     public init?(
         host: String,
         additionalHeaders: [String: String]? = nil,

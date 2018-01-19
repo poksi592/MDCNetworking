@@ -10,15 +10,9 @@ import Foundation
 
 public struct NetworkClient {
     
-    fileprivate(set) var configuration: NetworkConfiguration
+    private (set) var configuration: NetworkConfiguration
     
-    @available(*, unavailable)
-    init() {
-        fatalError()
-    }
-    
-    init?(configuration: NetworkConfiguration) {
-        
+    public init?(configuration: NetworkConfiguration) {
         self.configuration = configuration
     }
 }

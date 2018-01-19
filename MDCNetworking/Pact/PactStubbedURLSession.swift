@@ -14,7 +14,6 @@ public class PactStubbedURLSession: URLSession {
     private (set) var urlResponse: URLResponse
     
     public init(response: Data, urlResponse: URLResponse) {
-        
         self.response = response
         self.urlResponse = urlResponse
     }

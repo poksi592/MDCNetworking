@@ -88,11 +88,6 @@ public class JSONSession: NSObject, CancelableSession {
     public var session: URLSession?
     public var sessionProvider: URLSessionProvider? = nil
     
-    @available(*, unavailable)
-    override init() {
-        fatalError()
-    }
-    
     public required init(
         requestURLPath: String,
         httpMethod: HTTPMethod = .get,
