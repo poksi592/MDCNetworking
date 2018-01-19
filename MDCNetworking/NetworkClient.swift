@@ -1,5 +1,5 @@
 //
-//  Client.swift
+//  NetworkClient.swift
 //  MDCNetworking
 //
 //  Created by Despotovic, Mladen on 19/12/2016.
@@ -8,16 +8,16 @@
 
 import Foundation
 
-public struct Client {
+public struct NetworkClient {
     
-    fileprivate(set) var configuration: Configuration
+    fileprivate(set) var configuration: NetworkConfiguration
     
     @available(*, unavailable)
     init() {
         fatalError()
     }
     
-    init?(configuration: Configuration) {
+    init?(configuration: NetworkConfiguration) {
         
         self.configuration = configuration
     }

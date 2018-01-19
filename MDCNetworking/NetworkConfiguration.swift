@@ -1,5 +1,5 @@
 //
-//  Configuration.swift
+//  NetworkConfiguration.swift
 //  MDCNetworking
 //
 //  Created by Despotovic, Mladen on 19/12/2016.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Configuration {
+public struct NetworkConfiguration {
     
     public struct UrlConstructionError: Error {}
     public struct PathPercentEncodingError: Error {}

@@ -26,7 +26,7 @@ public protocol URLSessionProvider {
 public protocol CancelableSession: URLSessionDelegate {
     
     var completion: RequestCompletion { get set }
-    var configuration: Configuration { get set }
+    var configuration: NetworkConfiguration { get set }
     var requestURLPath: String { get set }
     var httpMethod: HTTPMethod { get set }
     var additionalHeaders: [String: String] { get set }
@@ -40,7 +40,7 @@ public protocol CancelableSession: URLSessionDelegate {
         httpMethod: HTTPMethod,
         parameters: [String: String]?,
         httpBody: Data?,
-        configuration: Configuration,
+        configuration: NetworkConfiguration,
         session: URLSession?,
         completion: @escaping RequestCompletion
     )
@@ -79,7 +79,7 @@ extension CancelableSession {
 public class JSONSession: NSObject, CancelableSession {
 
     public var completion: RequestCompletion
-    public var configuration: Configuration
+    public var configuration: NetworkConfiguration
     public var requestURLPath: String
     public var httpMethod: HTTPMethod
     public var additionalHeaders: [String: String] = [:]
@@ -98,7 +98,7 @@ public class JSONSession: NSObject, CancelableSession {
         httpMethod: HTTPMethod = .get,
         parameters: [String: String]? = nil,
         httpBody: Data? = nil,
-        configuration: Configuration,
+        configuration: NetworkConfiguration,
         session: URLSession? = nil,
         completion: @escaping RequestCompletion
     ) {
