@@ -25,19 +25,16 @@ class ConfigurationTests: XCTestCase {
         
         // Designated initializer
         let session1 = NetworkConfiguration(host: "https://somehost")
-        XCTAssertNotNil(session1)
         XCTAssertEqual(session1?.host.description, "https://somehost")
         
         // Additional headers
         let session2 = NetworkConfiguration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"])
-        XCTAssertNotNil(session2)
         XCTAssertEqual(session2?.additionalHeaders.count, 2)
         
         // Timeout
         let session3 = NetworkConfiguration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"], timeout: 20)
-        XCTAssertNotNil(session3)
         XCTAssertEqual(session3?.timeout, 20)
         
         // Session configuration
@@ -47,7 +44,6 @@ class ConfigurationTests: XCTestCase {
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
                                             timeout: 20,
                                             sessionConfiguration: configuration)
-        XCTAssertNotNil(session4)
         XCTAssertEqual(session4?.sessionConfiguration.timeoutIntervalForRequest, 20)
     }
     
