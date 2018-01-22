@@ -10,7 +10,7 @@ import Foundation
 
 public struct NetworkClient {
     
-    private (set) var configuration: NetworkConfiguration
+    public private (set) var configuration: NetworkConfiguration
     
     public init?(configuration: NetworkConfiguration) {
         self.configuration = configuration
