@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class NetworkClient {
+open class NetworkClient {
     
-    public private (set) var configuration: NetworkConfiguration
+    open private (set) var configuration: NetworkConfiguration
     
-    public init?(configuration: NetworkConfiguration) {
+    open init?(configuration: NetworkConfiguration) {
         self.configuration = configuration
     }
 }
