@@ -35,16 +35,6 @@ public protocol CancelableSession: URLSessionDelegate {
     weak var session: URLSession? { get set }
     var sessionProvider: URLSessionProvider? { get set }
     
-    init(
-        requestURLPath: String,
-        httpMethod: HTTPMethod,
-        parameters: [String: String]?,
-        httpBody: Data?,
-        configuration: NetworkConfiguration,
-        session: URLSession?,
-        completion: @escaping RequestCompletion
-    )
-    
     func start() throws
     func cancel()
     func dataTaskClosure() -> DataTaskClosure

@@ -13,11 +13,11 @@ public struct NetworkConfiguration {
     public struct UrlConstructionError: Error {}
     public struct PathPercentEncodingError: Error {}
 
-    private (set) var host: URL
-    private (set) var additionalHeaders: [String:String]
-    private (set) var timeout: TimeInterval
-    private (set) var sessionConfiguration: URLSessionConfiguration
-    private (set) var certificatesPathsForResource: [String]?
+    let host: URL
+    let additionalHeaders: [String: String]
+    let timeout: TimeInterval
+    let sessionConfiguration: URLSessionConfiguration
+    let certificatesPathsForResource: [String]?
 
     public init?(
         host: String,
