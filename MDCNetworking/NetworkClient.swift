@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct NetworkClient {
+public class NetworkClient {
     
     public private (set) var configuration: NetworkConfiguration
     
