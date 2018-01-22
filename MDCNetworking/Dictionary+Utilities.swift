@@ -12,29 +12,28 @@ extension Dictionary where Key: ExpressibleByStringLiteral, Value: ExpressibleBy
     
     func URLParameters() -> String {
         
-        let string = self.reduce("") { (currentString, currentPair) in
-            
+        let string = reduce("") { (currentString, currentPair) in
             let URLEncodedKey = "\(currentPair.key)".URLEncodedString()
             let URLEncodedValue = "\(currentPair.value)".URLEncodedString()
             return currentString + URLEncodedKey + "=" + URLEncodedValue + "&"
         }
-        return String(string.characters.dropLast())
+        
+        return String(string.dropLast())
     }
 }
 
-extension Dictionary where Key: ExpressibleByStringLiteral & Hashable, Value: ExpressibleByStringLiteral {
+extension Dictionary where Key: ExpressibleByStringLiteral, Value: ExpressibleByStringLiteral {
     
     func URLParameters() -> String {
         
-        let string = self.reduce("") { (currentString, currentPair) in
-
+        let string = reduce("") { (currentString, currentPair) in
             let URLEncodedKey = "\(currentPair.key)".URLEncodedString()
             let URLEncodedValue = "\(currentPair.value)".URLEncodedString()
             return currentString + URLEncodedKey + "=" + URLEncodedValue + "&"
         }
-        return String(string.characters.dropLast())
+        
+        return String(string.dropLast())
     }
-    
 }
 
 

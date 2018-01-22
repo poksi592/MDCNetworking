@@ -8,96 +8,108 @@
 
 import Foundation
 
-enum HTTPMethodName: String {
-    
-    case GET = "GET"
-    case POST = "POST"
+public typealias RequestCompletion = (Any?, HTTPURLResponse?, NetworkError?, _ cancelled: Bool) -> Void
+public typealias DataTaskClosure = (Data?, URLResponse?, Error?) -> Void
+
+public enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case patch = "PATCH"
 }
 
+public protocol URLSessionProvider {
+    func session(for urlRequest:URLRequest) -> URLSession?
+}
 
-typealias RequestCompletion = (Any?, HTTPURLResponse?, NetworkError?, _ cancelled: Bool) -> Void
-typealias DataTaskClosure = (Data?, URLResponse?, Error?) -> Void
-
-protocol CancelableSession {
+public protocol CancelableSession: URLSessionDelegate {
     
     var completion: RequestCompletion { get set }
-    var configuration: Configuration { get set }
+    var configuration: NetworkConfiguration { get set }
     var requestURLPath: String { get set }
-    var HTTPMethod: HTTPMethodName { get set }
-    var additionalHeaders: [String:String] { get set }
+    var httpMethod: HTTPMethod { get set }
+    var additionalHeaders: [String: String] { get set }
     var parameters: [String: String]? { get set }
-    var session: URLSession? { get set }
+    var httpBody: Data? { get set }
+    weak var session: URLSession? { get set }
+    var sessionProvider: URLSessionProvider? { get set }
     
-    init(requestURLPath: String,
-          HTTPMethod: HTTPMethodName,
-          parameters: [String: String]?,
-          configuration: Configuration,
-          session: URLSession?,
-          completion: @escaping RequestCompletion)
+    init(
+        requestURLPath: String,
+        httpMethod: HTTPMethod,
+        parameters: [String: String]?,
+        httpBody: Data?,
+        configuration: NetworkConfiguration,
+        session: URLSession?,
+        completion: @escaping RequestCompletion
+    )
     
-    mutating func start()
+    func start() throws
     func cancel()
     func dataTaskClosure() -> DataTaskClosure
 }
 
 extension CancelableSession {
     
-    mutating func start() {
+    public func start() throws {
+        var request = try configuration.request(path: requestURLPath, parameters: parameters)
+
+        request.httpMethod = httpMethod.rawValue
+        request.httpBody = httpBody
         
-        guard let request = configuration.request(path: requestURLPath, parameters: parameters) else { return }
         if session == nil {
-            
-            session = URLSession.init(configuration: configuration.sessionConfiguration)
+            session = URLSession(configuration: configuration.sessionConfiguration)
         }
+        
         let task = session?.dataTask(with: request, completionHandler: dataTaskClosure())
+        
         task?.resume()
     }
     
-    func cancel() -> () {
+    public func cancel() {
         
         if let session = session {
-
             session.invalidateAndCancel()
-            completion(nil, HTTPURLResponse(), .TaskCancelled, false)
+            completion(nil, HTTPURLResponse(), .taskCancelled, false)
         }
     }
 }
 
-struct JSONSession: CancelableSession {
+public class JSONSession: NSObject, CancelableSession {
+
+    public var completion: RequestCompletion
+    public var configuration: NetworkConfiguration
+    public var requestURLPath: String
+    public var httpMethod: HTTPMethod
+    public var additionalHeaders: [String: String] = [:]
+    public var parameters: [String: String]?
+    public var httpBody: Data?
+    public var session: URLSession?
+    public var sessionProvider: URLSessionProvider? = nil
     
-    internal(set) var completion: RequestCompletion
-    internal(set) var configuration: Configuration
-    internal(set) var requestURLPath: String
-    internal(set) var HTTPMethod: HTTPMethodName
-    internal(set) var additionalHeaders: [String:String] = [:]
-    internal(set) var parameters: [String: String]? = nil
-    internal(set) var session: URLSession? = nil
-    
-    @available(*, unavailable)
-    init() {
-        fatalError()
-    }
-    
-    init(requestURLPath: String,
-         HTTPMethod: HTTPMethodName = .GET,
-         parameters: [String: String]? = nil,
-         configuration: Configuration,
-         session: URLSession? = nil,
-         completion: @escaping RequestCompletion) {
-        
+    public required init(
+        requestURLPath: String,
+        httpMethod: HTTPMethod = .get,
+        parameters: [String: String]? = nil,
+        httpBody: Data? = nil,
+        configuration: NetworkConfiguration,
+        session: URLSession? = nil,
+        completion: @escaping RequestCompletion
+    ) {
         self.requestURLPath = requestURLPath
-        self.HTTPMethod = HTTPMethod
+        self.httpMethod = httpMethod
         self.completion = completion
         self.configuration = configuration
         self.session = session
+        self.httpBody = httpBody
+        
         if let parameters = parameters {
-            
             self.parameters = parameters
         }
-        self.additionalHeaders = ["Content-Type":"application/json"]
     }
     
-    func dataTaskClosure() -> (Data?, URLResponse?, Error?) -> Void {
+    public func dataTaskClosure() -> (Data?, URLResponse?, Error?) -> Void {
         
         return { (data, response, error) in
             
@@ -108,11 +120,11 @@ struct JSONSession: CancelableSession {
                 do {
                     
                     responseObject = try JSONSerialization.jsonObject(with: data,
-                                                                      options: JSONSerialization.ReadingOptions.mutableContainers) as? [String: Any]
+                                                                      options: .mutableContainers) as? [String: Any]
                 }
                 catch {
                     
-                    networkingError = NetworkError.SerialisationFailed
+                    networkingError = .serializationFailed
                 }
             }
             
@@ -121,7 +133,7 @@ struct JSONSession: CancelableSession {
                 if let data = data {
                     
                     responseObject = try? JSONSerialization.jsonObject(with: data,
-                                                                       options: JSONSerialization.ReadingOptions.mutableContainers) as! [String: Any]
+                                                                       options: .mutableContainers) as! [String: Any]
                 }
                 networkingError = NetworkError(error: error,
                                                response: response as? HTTPURLResponse,
@@ -131,5 +143,58 @@ struct JSONSession: CancelableSession {
         }
     }
 
+    public func urlSession(
+        _ session: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        guard let certificatesPathsForResource = configuration.certificatesPathsForResource else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        let serverTrust = challenge.protectionSpace.serverTrust
+        let certificate = SecTrustGetCertificateAtIndex(serverTrust!, 0)
+        
+        // Set SSL policies for domain name check
+        let policies = NSMutableArray();
+        policies.add(SecPolicyCreateSSL(true, (challenge.protectionSpace.host as CFString)))
+        SecTrustSetPolicies(serverTrust!, policies);
+        
+        // Evaluate server certificate
+        var result: SecTrustResultType = .invalid
+        SecTrustEvaluate(serverTrust!, &result)
+        let isServerTrusted:Bool = (result == .unspecified || result == .proceed)
+        guard isServerTrusted == true else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        // Get local and remote cert data
+        let remoteCertificateData:NSData = SecCertificateCopyData(certificate!)
+        var credential: URLCredential? = nil
+        
+        for certificatePathForResource in certificatesPathsForResource {
+            
+            guard let pathToCert = Bundle.main.path(forResource: certificatePathForResource, ofType: "cer") else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            let urlToCert = URL(fileURLWithPath: pathToCert)
+            guard let localCertificate = try? Data(contentsOf: urlToCert) else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            if (remoteCertificateData.isEqual(to: localCertificate)) {
+                credential = URLCredential(trust: serverTrust!)
+            }
+        }
+        
+        guard let pinnedCredential = credential else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        completionHandler(.useCredential, pinnedCredential)
+    }
 }
 

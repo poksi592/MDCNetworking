@@ -24,18 +24,18 @@ class ConfigurationTests: XCTestCase {
     func testInstantiation() {
         
         // Designated initializer
-        let session1 = Configuration(host: "https://somehost")
+        let session1 = NetworkConfiguration(host: "https://somehost")
         XCTAssertNotNil(session1)
         XCTAssertEqual(session1?.host.description, "https://somehost")
         
         // Additional headers
-        let session2 = Configuration(host: "https://somehost",
+        let session2 = NetworkConfiguration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"])
         XCTAssertNotNil(session2)
         XCTAssertEqual(session2?.additionalHeaders.count, 2)
         
         // Timeout
-        let session3 = Configuration(host: "https://somehost",
+        let session3 = NetworkConfiguration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"], timeout: 20)
         XCTAssertNotNil(session3)
         XCTAssertEqual(session3?.timeout, 20)
@@ -43,7 +43,7 @@ class ConfigurationTests: XCTestCase {
         // Session configuration
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
-        let session4 = Configuration(host: "https://somehost",
+        let session4 = NetworkConfiguration(host: "https://somehost",
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
                                             timeout: 20,
                                             sessionConfiguration: configuration)
@@ -54,21 +54,21 @@ class ConfigurationTests: XCTestCase {
     func testURLRequest() {
         
         // basic request
-        var session = Configuration(host: "https://somehost")
-        var request = session!.request(path: "https://somehost", parameters: nil)
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost")
+        var session = NetworkConfiguration(host: "https://somehost")
+        var request = try! session!.request(path: "path", parameters: nil)
+
+        XCTAssertEqual(request.description, "https://somehost/path")
         
         // Single parameter
-        session = Configuration(host: "https://somehost")
-        request = session!.request(path: "https://somehost", parameters: ["parameter": "value"])
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost?parameter=value")
+        session = NetworkConfiguration(host: "https://somehost")
+        request = try! session!.request(path: "path", parameters: ["parameter": "value"])
+        
+        XCTAssertEqual(request.description, "https://somehost/path?parameter=value")
         
         // Two parameters
-        session = Configuration(host: "https://somehost")
-        request = session!.request(path: "https://somehost", parameters: ["parameter": "value", "parameter1": "value1"])
-        XCTAssertNotNil(request)
-        XCTAssertEqual(request?.description, "https://somehost?parameter=value&parameter1=value1")
+        session = NetworkConfiguration(host: "https://somehost")
+        request = try! session!.request(path: "path", parameters: ["parameter": "value", "parameter1": "value1"])
+        
+        XCTAssertEqual(request.description, "https://somehost/path?parameter=value&parameter1=value1")
     }
 }

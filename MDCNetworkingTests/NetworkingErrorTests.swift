@@ -31,7 +31,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError400 = NetworkError(error: nil, response: mockedResponse400!, serverErrorPayload: nil)
         // Test and execute
-        if case .BadRequest400(_, let response, _) = networkError400! {
+        if case .badRequest400(_, let response, _) = networkError400! {
             XCTAssertEqual(response?.statusCode, 400)
         }
         else {
@@ -46,7 +46,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError401 = NetworkError(error: nil, response: mockedResponse401!, serverErrorPayload: nil)
         // Test and execute
-        if case .Unauthorized401(_, let response, _) = networkError401! {
+        if case .unauthorized401(_, let response, _) = networkError401! {
             XCTAssertEqual(response?.statusCode, 401)
         }
         else {
@@ -61,7 +61,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError403 = NetworkError(error: nil, response: mockedResponse403!, serverErrorPayload: nil)
         // Test and execute
-        if case .Forbidden403(_, let response, _) = networkError403! {
+        if case .forbidden403(_, let response, _) = networkError403! {
             XCTAssertEqual(response?.statusCode, 403)
         }
         else {
@@ -76,7 +76,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError404 = NetworkError(error: nil, response: mockedResponse404!, serverErrorPayload: nil)
         // Test and execute
-        if case .NotFound404(_, let response, _) = networkError404! {
+        if case .notFound404(_, let response, _) = networkError404! {
             XCTAssertEqual(response?.statusCode, 404)
         }
         else {
@@ -94,7 +94,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError500 = NetworkError(error: nil, response: mockedResponse500!, serverErrorPayload: nil)
         // Test and execute
-        if case .ServerError500(_, let response, _) = networkError500! {
+        if case .serverError500(_, let response, _) = networkError500! {
             XCTAssertEqual(response?.statusCode, 500)
         }
         else {
@@ -109,7 +109,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError600 = NetworkError(error: nil, response: mockedResponse600!, serverErrorPayload: nil)
         // Test and execute
-        guard case .NotRecognized = networkError600! else {
+        guard case .other = networkError600! else {
             XCTAssertTrue(false, "error")
             return
         }
@@ -125,7 +125,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkErrorMinusOne = NetworkError(error: nil, response: mockedResponseMinusOne!, serverErrorPayload: nil)
         // Test and execute
-        guard case .NotRecognized = networkErrorMinusOne! else {
+        guard case .other = networkErrorMinusOne! else {
             XCTAssertTrue(false, "error")
             return
         }
@@ -138,7 +138,7 @@ class NetworkingErrorTests: XCTestCase {
                                                                    headerFields: nil)
         let networkError999 = NetworkError(error: nil, response: mockedResponse999!, serverErrorPayload: nil)
         // Test and execute
-        guard case .NotRecognized = networkError999! else {
+        guard case .other = networkError999! else {
             XCTAssertTrue(false, "error")
             return
         }
