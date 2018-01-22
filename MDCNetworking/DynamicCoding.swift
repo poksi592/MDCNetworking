@@ -138,28 +138,19 @@ extension KeyedDecodingContainer where Key == DynamicKey {
             } else if let value = try? decode([String: Any].self, forKey: key) {
                 dict[key.stringValue] = value
             } else {
-                var wasDecoded = false
-                
                 switch strategy {
                     case .decimal:
                         if let value = try? decode(Decimal.self, forKey: key) {
                             dict[key.stringValue] = value
-                            wasDecoded = true
                         }
                     case .double:
                         if let value = try? decode(Double.self, forKey: key) {
                             dict[key.stringValue] = value
-                            wasDecoded = true
                         }
                     case .float:
                         if let value = try? decode(Float.self, forKey: key) {
                             dict[key.stringValue] = value
-                            wasDecoded = true
                         }
-                }
-                
-                if !wasDecoded {
-                    assertionFailure("Key \(key.stringValue) type not supported")
                 }
             }
         }

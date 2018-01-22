@@ -165,7 +165,7 @@ public struct Pact: Encodable {
     public let providerName: String
     public let consumerName: String
     public let version: String
-    public let interactions: [Interaction]
+    public private (set) var interactions: [Interaction]
     
     /**
      * Initializes a pact with specified provider and consumer names, interactions and application version. Note that
@@ -176,6 +176,14 @@ public struct Pact: Encodable {
         self.consumerName = consumerName
         self.interactions = interactions
         self.version = version
+    }
+    
+    mutating func append(_ interaction: Interaction) {
+        interactions.append(interaction)
+    }
+    
+    mutating func append(_ interactions: [Interaction]) {
+        self.interactions.append(contentsOf: interactions)
     }
     
     public func encode(to encoder: Encoder) throws {
