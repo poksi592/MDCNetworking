@@ -8,7 +8,14 @@
 
 import Foundation
 
-open class PactStubProvider {
+/**
+ * Concrete `URLSessionProvider` implementation that generates a Pact based on provided details and allows for adding
+ * interactions (request, response pairs). `URLSessionProvider` interface provides `URLSession`s with stubbed responses
+ * for requests matching the ones specified in provided interactions.
+ *
+ * More information about Pact specification can be found here: https://docs.pact.io/documentation/how_does_pact_work.html
+ */
+open class PactSessionProvider {
     
     public struct UrlGenerationError: Error {}
     public struct UrlResponseGenerationError: Error {}
@@ -42,6 +49,9 @@ open class PactStubProvider {
         )
     }
     
+    /**
+     * Attempts to generate a `Pact.Interaction` and appends it to list of known interactions.
+     */
     open func generateInteraction(
         providerState: String,
         description: String,
@@ -82,7 +92,7 @@ open class PactStubProvider {
     }
 }
 
-extension PactStubProvider: URLSessionProvider {
+extension PactSessionProvider: URLSessionProvider {
     
     public func session(for urlRequest: URLRequest) -> URLSession? {
         let matchingInteractions = pact.interactions.filter { $0.matches(request: urlRequest, matchingOptions: [.url]) }
