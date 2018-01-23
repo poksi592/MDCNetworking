@@ -12,15 +12,15 @@ public enum NetworkError: Error {
 
     case serializationFailed
     case taskCancelled
-    case badRequest400(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
-    case unauthorized401(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
-    case forbidden403(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
-    case notFound404(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
-    case other400(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
-    case serverError500(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?)
+    case badRequest400(error: Error?, response: HTTPURLResponse?, payload: Data?)
+    case unauthorized401(error: Error?, response: HTTPURLResponse?, payload: Data?)
+    case forbidden403(error: Error?, response: HTTPURLResponse?, payload: Data?)
+    case notFound404(error: Error?, response: HTTPURLResponse?, payload: Data?)
+    case other400(error: Error?, response: HTTPURLResponse?, payload: Data?)
+    case serverError500(error: Error?, response: HTTPURLResponse?, payload: Data?)
     case other
     
-    init?(error: Error?, response: HTTPURLResponse?, serverErrorPayload: [String: Any]?) {
+    init?(error: Error?, response: HTTPURLResponse?, payload: Data?) {
         
         let responseCode: Int
         if let response = response {
@@ -34,17 +34,17 @@ public enum NetworkError: Error {
             case 200..<300:
                 return nil
             case 400:
-                self = .badRequest400(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .badRequest400(error: error, response: response, payload: payload)
             case 401:
-                self = .unauthorized401(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .unauthorized401(error: error, response: response, payload: payload)
             case 403:
-                self = .forbidden403(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .forbidden403(error: error, response: response, payload: payload)
             case 404:
-                self = .notFound404(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .notFound404(error: error, response: response, payload: payload)
             case 405..<500:
-                self = .other400(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .other400(error: error, response: response, payload: payload)
             case 500..<600:
-                self = .serverError500(error: error, response: response, serverErrorPayload: serverErrorPayload)
+                self = .serverError500(error: error, response: response, payload: payload)
             default:
                 self = .other
         }

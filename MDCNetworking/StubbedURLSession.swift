@@ -34,7 +34,7 @@ public class StubbedURLSession: URLSession {
                                                                     headerFields: nil)
             completionHandler(nil, mockedResponse, NetworkError(error: nil,
                                                      response: mockedResponse,
-                                                     serverErrorPayload: nil))
+                                                     payload: nil))
         }
 
         return MockURLSessionDataTask()
