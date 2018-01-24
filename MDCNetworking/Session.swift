@@ -63,7 +63,6 @@ extension CancelableSession {
 
 public class HTTPSession: NSObject, CancelableSession {
     
-
     public var completion: ResponseCallback
     public var configuration: NetworkConfiguration
     public var requestURLPath: String
