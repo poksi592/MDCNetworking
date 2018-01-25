@@ -23,7 +23,7 @@ public protocol URLSessionProvider {
     func session(for urlRequest:URLRequest) -> URLSession?
 }
 
-public protocol CancelableSession: URLSessionDelegate {
+public protocol HTTPSessionInterface: URLSessionDelegate {
     
     var completion: ResponseCallback { get set }
     var configuration: NetworkConfiguration { get set }
@@ -40,7 +40,7 @@ public protocol CancelableSession: URLSessionDelegate {
     func dataTaskClosure() -> DataTaskCallback
 }
 
-extension CancelableSession {
+extension HTTPSessionInterface {
     
     public func start() throws {
         var request = try configuration.request(path: requestURLPath, parameters: parameters)
@@ -61,7 +61,7 @@ extension CancelableSession {
     }
 }
 
-public class HTTPSession: NSObject, CancelableSession {
+public class HTTPSession: NSObject, HTTPSessionInterface {
     
     public var completion: ResponseCallback
     public var configuration: NetworkConfiguration

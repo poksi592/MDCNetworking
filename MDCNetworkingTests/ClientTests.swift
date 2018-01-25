@@ -11,25 +11,11 @@ import XCTest
 
 class ClientTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
     func testClientInitialization() {
-        
         // Test with configuration
         let session1 = NetworkConfiguration(host: "https://somehost")
         let client1 = NetworkClient(configuration: session1!)
         XCTAssertNotNil(client1)
-        XCTAssertNotNil(client1?.configuration)
-        
+        XCTAssertNotNil(client1.configuration)
     }
-
-    
 }
