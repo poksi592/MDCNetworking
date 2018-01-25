@@ -48,7 +48,15 @@ extension HTTPSessionInterface {
         request.httpMethod = httpMethod.rawValue
         request.httpBody = httpBody
         
-        (session ?? URLSession(configuration: configuration.sessionConfiguration))
+        if session == nil {
+            session = sessionProvider?.session(for: request) ?? URLSession(
+                configuration: configuration.sessionConfiguration,
+                delegate: self,
+                delegateQueue: nil
+            )
+        }
+        
+        session?
             .dataTask(with: request, completionHandler: dataTaskClosure())
             .resume()
     }
