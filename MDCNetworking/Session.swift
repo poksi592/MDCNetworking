@@ -72,11 +72,11 @@ extension JSONSessionInterface {
 
 public struct Request {
     
-    let urlPath: String
-    let method: HTTPMethod
-    let additionalHeaders: [String: String]
-    let parameters: [String: String]?
-    let body: Data?
+    public var urlPath: String
+    public var method: HTTPMethod
+    public var additionalHeaders: [String: String]
+    public var parameters: [String: String]?
+    public var body: Data?
     
     public init(
         urlPath: String,
