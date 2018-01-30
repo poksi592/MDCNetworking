@@ -13,33 +13,33 @@ import Foundation
 /**
  * Coding key that has a dynamic value.
  */
-struct DynamicKey: CodingKey {
+public struct DynamicKey: CodingKey {
     
-    var stringValue: String
+    public var stringValue: String
     
-    var intValue: Int? {
+    public var intValue: Int? {
         return nil
     }
     
-    init?(stringValue: String) {
+    public init?(stringValue: String) {
         self.stringValue = stringValue
     }
     
-    init?(intValue: Int) {
+    public init?(intValue: Int) {
         return nil
     }
 }
 
 // MARK: - Encoding
 
-extension UnkeyedEncodingContainer {
+public extension UnkeyedEncodingContainer {
     
     /**
      * Recursively encodes any JSON primitive (int, bool, string, dictionary etc.). Workaround for encode having to be
      * used on concrete *Encodable* types, encoding a *[String : Any]* or *[String: Encodable]* dictionary will crash as
      * of Swift 4.
      */
-    mutating func encode(jsonValue any: Any) throws {
+    public mutating func encode(jsonValue any: Any) throws {
         switch any {
             case let value as String:
                 try encode(value)
@@ -71,14 +71,14 @@ extension UnkeyedEncodingContainer {
     }
 }
 
-extension KeyedEncodingContainer where Key == DynamicKey {
+public extension KeyedEncodingContainer where Key == DynamicKey {
     
     /**
      * Recursively encodes any JSON primitive (int, bool, string, dictionary etc.). Workaround for encode having to be
      * used on concrete *Encodable* types, encoding a *[String : Any]* or *[String: Encodable]* dictionary will crash as
      * of Swift 4.
      */
-    mutating func encode(jsonValue any: Any, forKey key: DynamicKey) throws {
+    public mutating func encode(jsonValue any: Any, forKey key: DynamicKey) throws {
         switch any {
             case let value as String:
                 try encode(value, forKey: key)
@@ -112,18 +112,18 @@ extension KeyedEncodingContainer where Key == DynamicKey {
 
 // MARK: - Decoding
 
-enum FloatingPointDecodingStrategy {
+public enum FloatingPointDecodingStrategy {
     case decimal
     case double
     case float
 }
 
-extension KeyedDecodingContainer where Key == DynamicKey {
+public extension KeyedDecodingContainer where Key == DynamicKey {
     
     /**
      * Decodes dynamic keys with values from a JSON container.
      */
-    func decodeDynamicKeyValues(floatingPointStrategy strategy: FloatingPointDecodingStrategy) -> [String : Any] {
+    public func decodeDynamicKeyValues(floatingPointStrategy strategy: FloatingPointDecodingStrategy) -> [String : Any] {
         var dict = [String: Any]()
         
         for key in allKeys {
