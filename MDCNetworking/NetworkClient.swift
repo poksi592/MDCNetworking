@@ -12,7 +12,7 @@ open class NetworkClient {
     
     open private (set) var configuration: NetworkConfiguration
     
-    public init?(configuration: NetworkConfiguration) {
+    public init(configuration: NetworkConfiguration) {
         self.configuration = configuration
     }
 }
