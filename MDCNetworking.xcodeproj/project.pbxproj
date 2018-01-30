@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		602B6A97201F2ABB00724445 /* ModelDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602B6A96201F2ABB00724445 /* ModelDecoder.swift */; };
+		602B6A99201F2AC300724445 /* ModelEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602B6A98201F2AC300724445 /* ModelEncoder.swift */; };
+		602B6A9B201F2C2A00724445 /* ModelDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602B6A9A201F2C2A00724445 /* ModelDecoderTests.swift */; };
+		602B6A9D201F2C4B00724445 /* ModelEncoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602B6A9C201F2C4B00724445 /* ModelEncoderTests.swift */; };
+		602B6AA0201F2CCF00724445 /* MockSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602B6A9F201F2CCF00724445 /* MockSerializer.swift */; };
 		60300C46200F78DD00AF7A0A /* Pact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C45200F78DD00AF7A0A /* Pact.swift */; };
 		60300C48200F792800AF7A0A /* DynamicCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C47200F792800AF7A0A /* DynamicCoding.swift */; };
 		60300C4A200F797700AF7A0A /* PactStubbedURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60300C49200F797700AF7A0A /* PactStubbedURLSession.swift */; };
@@ -41,6 +46,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		602B6A96201F2ABB00724445 /* ModelDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecoder.swift; sourceTree = "<group>"; };
+		602B6A98201F2AC300724445 /* ModelEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelEncoder.swift; sourceTree = "<group>"; };
+		602B6A9A201F2C2A00724445 /* ModelDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecoderTests.swift; sourceTree = "<group>"; };
+		602B6A9C201F2C4B00724445 /* ModelEncoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelEncoderTests.swift; sourceTree = "<group>"; };
+		602B6A9F201F2CCF00724445 /* MockSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSerializer.swift; sourceTree = "<group>"; };
 		60300C45200F78DD00AF7A0A /* Pact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pact.swift; sourceTree = "<group>"; };
 		60300C47200F792800AF7A0A /* DynamicCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicCoding.swift; sourceTree = "<group>"; };
 		60300C49200F797700AF7A0A /* PactStubbedURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PactStubbedURLSession.swift; sourceTree = "<group>"; };
@@ -86,6 +96,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		602B6A95201F2A9800724445 /* Coding */ = {
+			isa = PBXGroup;
+			children = (
+				60300C47200F792800AF7A0A /* DynamicCoding.swift */,
+				602B6A96201F2ABB00724445 /* ModelDecoder.swift */,
+				602B6A98201F2AC300724445 /* ModelEncoder.swift */,
+			);
+			path = Coding;
+			sourceTree = "<group>";
+		};
+		602B6A9E201F2CC500724445 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				602B6A9F201F2CCF00724445 /* MockSerializer.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		60300C44200F78C800AF7A0A /* Pact */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,6 +145,7 @@
 		6DA77EED1E02FEA800D3E3B1 /* MDCNetworking */ = {
 			isa = PBXGroup;
 			children = (
+				602B6A95201F2A9800724445 /* Coding */,
 				60300C44200F78C800AF7A0A /* Pact */,
 				6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */,
 				6DA77EEF1E02FEA800D3E3B1 /* Info.plist */,
@@ -124,7 +153,6 @@
 				6DA77F091E07E06E00D3E3B1 /* NetworkConfiguration.swift */,
 				6DA77F0F1E0802B500D3E3B1 /* NetworkClient.swift */,
 				6DA77F111E08250400D3E3B1 /* Session.swift */,
-				60300C47200F792800AF7A0A /* DynamicCoding.swift */,
 				6DA77F1D1E1FF34100D3E3B1 /* StubbedURLSession.swift */,
 				6DA77F151E092DF300D3E3B1 /* Dictionary+Utilities.swift */,
 				6DA77F191E09543D00D3E3B1 /* String+Utilities.swift */,
@@ -136,6 +164,7 @@
 		6DA77EF81E02FEA800D3E3B1 /* MDCNetworkingTests */ = {
 			isa = PBXGroup;
 			children = (
+				602B6A9E201F2CC500724445 /* Models */,
 				6D398AFB1E254B7F005A67E7 /* Test1.json */,
 				6DA77EFB1E02FEA800D3E3B1 /* Info.plist */,
 				6DA77F071E0404B300D3E3B1 /* NetworkingErrorTests.swift */,
@@ -144,6 +173,8 @@
 				6DA77F131E08345700D3E3B1 /* SessionTests.swift */,
 				6DA77F171E092E8C00D3E3B1 /* DictionaryUtilitiesTests.swift */,
 				6DA77F1B1E1FE2BA00D3E3B1 /* StubbedURLSessionTests.swift */,
+				602B6A9A201F2C2A00724445 /* ModelDecoderTests.swift */,
+				602B6A9C201F2C4B00724445 /* ModelEncoderTests.swift */,
 			);
 			path = MDCNetworkingTests;
 			sourceTree = "<group>";
@@ -269,8 +300,10 @@
 				6DA77F0A1E07E06E00D3E3B1 /* NetworkConfiguration.swift in Sources */,
 				6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */,
 				60300C46200F78DD00AF7A0A /* Pact.swift in Sources */,
+				602B6A97201F2ABB00724445 /* ModelDecoder.swift in Sources */,
 				6DA77F101E0802B500D3E3B1 /* NetworkClient.swift in Sources */,
 				609E824A2016004F004B7A7C /* PactStubProvider.swift in Sources */,
+				602B6A99201F2AC300724445 /* ModelEncoder.swift in Sources */,
 				6DA77F1E1E1FF34100D3E3B1 /* StubbedURLSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -284,6 +317,9 @@
 				6DA77F081E0404B300D3E3B1 /* NetworkingErrorTests.swift in Sources */,
 				6DA77F0E1E08022F00D3E3B1 /* ClientTests.swift in Sources */,
 				6DA77F0C1E07F81E00D3E3B1 /* ConfigurationTests.swift in Sources */,
+				602B6A9B201F2C2A00724445 /* ModelDecoderTests.swift in Sources */,
+				602B6A9D201F2C4B00724445 /* ModelEncoderTests.swift in Sources */,
+				602B6AA0201F2CCF00724445 /* MockSerializer.swift in Sources */,
 				6DA77F141E08345700D3E3B1 /* SessionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

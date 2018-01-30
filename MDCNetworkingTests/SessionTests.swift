@@ -11,24 +11,14 @@ import XCTest
 
 class SessionTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
     func testInitialising() {
     
         // Test with default GET method
         let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
-        let session1 = HTTPSession(requestURLPath: "https://somehost",
+        let session1 = JSONSession(urlPath: "https://somehost",
                                    configuration: configuration!) { (result, response, error, cancelled) in }
         XCTAssertNotNil(session1)
-        guard case .get = session1.httpMethod else {
+        guard case .get = session1.request.method else {
             XCTAssert(false, "error")
             return
         }
@@ -41,22 +31,16 @@ class SessionTests: XCTestCase {
         let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
         let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         // Execute and test
-        let session1 = HTTPSession(
-            requestURLPath: "/v2/list-time-zone",
-            httpMethod: .get,
+        let session1 = GenericJSONSession<ZonesResponse>(
+            urlPath: "/v2/list-time-zone",
+            method: .get,
             parameters: parameters,
             configuration: configuration!
-        ) { (response, result, error, cancelled) in
+        ) { response, model, error, cancelled in
                                     
             XCTAssertNil(error)
-            
-            // TODO: Automatic JSON parsing was removed from the library, due to incompatibility with our project.
-            //       Result is returned as Data. Will fix once we get highlights running
-            
-//            let resultDictionary = result as! Data
-//            let zones = resultDictionary["zones"] as! [[String: Any]]
-//            let firstZone = zones.first!
-//            XCTAssertEqual(firstZone["countryCode"] as! String, "GB")
+            XCTAssertFalse(cancelled)
+            XCTAssertEqual(model?.zones.first?.countryCode, "GB")
             
             expectationForTest.fulfill()
         }
@@ -70,6 +54,14 @@ class SessionTests: XCTestCase {
         }
         
         waitForExpectations(timeout: 5, handler: nil)
+    }
+    
+    struct ZonesResponse: Decodable {
+        struct CountryCode: Decodable {
+            let countryCode: String
+        }
+        
+        let zones: [CountryCode]
     }
     
     func test_InjectStubbedResponse() {
@@ -86,24 +78,18 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        let session1 = HTTPSession(
-            requestURLPath: "/v2/list-time-zone",
-            httpMethod: .get,
+        let session1 = GenericJSONSession<ZonesResponse>(
+            urlPath: "/v2/list-time-zone",
+            method: .get,
             parameters: parameters,
             configuration: configuration!,
             session: stubbedSession
-        ) { (result, response, error, cancelled) in
+        ) { result, model, error, cancelled in
                                     
             XCTAssertNil(error)
-            
-            // TODO: Automatic JSON parsing was removed from the library, due to incompatibility with our project.
-            //       Result is returned as Data. Will fix once we get highlights running
-            
-//            let resultDictionary = result as! [String: Any]
-//            let zones = resultDictionary["zones"] as! [[String: Any]]
-//            let firstZone = zones.first!
-//            XCTAssertEqual(firstZone["countryCode"] as! String, "UK")
-            
+            XCTAssertFalse(cancelled)
+            XCTAssertEqual(model?.zones.first?.countryCode, "UK")
+
             expectationForTest.fulfill()
         }
         XCTAssertNotNil(session1)
@@ -135,23 +121,17 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        let session1 = HTTPSession(
-            requestURLPath: "/v2/list-time-zone",
-            httpMethod: .get,
+        let session1 = GenericJSONSession<ZonesResponse>(
+            urlPath: "/v2/list-time-zone",
+            method: .get,
             parameters: parameters,
             configuration: configuration!,
             session: stubbedSession
-        ) { (response, result, error, cancelled) in
+        ) { response, model, error, cancelled in
                                     
             XCTAssertNil(error)
-            
-            // TODO: Automatic JSON parsing was removed from the library, due to incompatibility with our project.
-            //       Result is returned as Data. Will fix once we get highlights running
-            
-//            let resultDictionary = result as! [String: Any]
-//            let zones = resultDictionary["zones"] as! [[String: Any]]
-//            let firstZone = zones.first!
-//            XCTAssertEqual(firstZone["countryCode"] as! String, "UK")
+            XCTAssertFalse(cancelled)
+            XCTAssertEqual(model?.zones.first?.countryCode, "UK")
             
             expectationForTest.fulfill()
         }
@@ -182,17 +162,17 @@ class SessionTests: XCTestCase {
                                response:responseString)
         
         // Execute and test
-        let session1 = HTTPSession(
-            requestURLPath: "/v2/list-time-zone",
-            httpMethod: .get,
+        let session1 = JSONSession(
+            urlPath: "/v2/list-time-zone",
+            method: .get,
             parameters: parameters,
             configuration: configuration!,
             session: stubbedSession
-        ) { (response, result, error, cancelled) in
+        ) { (response, model, error, cancelled) in
                                     
             XCTAssertNotNil(error)
 
-            guard case .badRequest400 = error! else {
+            guard let error = error, case .badRequest400 = error else {
                 XCTAssertTrue(false, "error")
                 return
             }

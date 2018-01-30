@@ -8,7 +8,6 @@
 
 import Foundation
 
-public typealias ResponseCallback = (HTTPURLResponse?, Data?, NetworkError?, _ cancelled: Bool) -> Void
 public typealias DataTaskCallback = (Data?, URLResponse?, Error?) -> Void
 
 public enum HTTPMethod: String {
@@ -20,36 +19,38 @@ public enum HTTPMethod: String {
 }
 
 public protocol URLSessionProvider {
-    func session(for urlRequest:URLRequest) -> URLSession?
+    func session(for urlRequest: URLRequest) -> URLSession?
 }
 
-public protocol HTTPSessionInterface: URLSessionDelegate {
+public struct EmptyResponseBody: Decodable {}
+
+public protocol JSONSessionInterface: URLSessionDelegate {
     
-    var completion: ResponseCallback { get set }
+    associatedtype ResponseModelType: Decodable
+    
+    typealias ResponseCallback = (HTTPURLResponse?, ResponseModelType?, NetworkError?, _ cancelled: Bool) -> Void
+    
     var configuration: NetworkConfiguration { get set }
-    var requestURLPath: String { get set }
-    var httpMethod: HTTPMethod { get set }
-    var additionalHeaders: [String: String] { get set }
-    var parameters: [String: String]? { get set }
-    var httpBody: Data? { get set }
+    var request: Request { get set }
     weak var session: URLSession? { get set }
     var sessionProvider: URLSessionProvider? { get set }
+    var completion: ResponseCallback { get set }
     
     func start() throws
     func cancel()
     func dataTaskClosure() -> DataTaskCallback
 }
 
-extension HTTPSessionInterface {
+extension JSONSessionInterface {
     
     public func start() throws {
-        var request = try configuration.request(path: requestURLPath, parameters: parameters)
+        var urlRequest = try configuration.request(path: request.urlPath, parameters: request.parameters)
 
-        request.httpMethod = httpMethod.rawValue
-        request.httpBody = httpBody
+        urlRequest.httpMethod = request.method.rawValue
+        urlRequest.httpBody = request.body
         
         if session == nil {
-            session = sessionProvider?.session(for: request) ?? URLSession(
+            session = sessionProvider?.session(for: urlRequest) ?? URLSession(
                 configuration: configuration.sessionConfiguration,
                 delegate: self,
                 delegateQueue: nil
@@ -57,7 +58,7 @@ extension HTTPSessionInterface {
         }
         
         session?
-            .dataTask(with: request, completionHandler: dataTaskClosure())
+            .dataTask(with: urlRequest, completionHandler: dataTaskClosure())
             .resume()
     }
     
@@ -69,48 +70,70 @@ extension HTTPSessionInterface {
     }
 }
 
-public class HTTPSession: NSObject, HTTPSessionInterface {
+public struct Request {
     
-    public var completion: ResponseCallback
-    public var configuration: NetworkConfiguration
-    public var requestURLPath: String
-    public var httpMethod: HTTPMethod
-    public var additionalHeaders: [String: String] = [:]
+    public var urlPath: String
+    public var method: HTTPMethod
+    public var additionalHeaders: [String: String]
     public var parameters: [String: String]?
-    public var httpBody: Data?
+    public var body: Data?
+    
+    public init(
+        urlPath: String,
+        method: HTTPMethod = .get,
+        additionalHeaders: [String: String] = [:],
+        parameters: [String: String]? = nil,
+        body: Data? = nil
+    ) {
+        self.urlPath = urlPath
+        self.method = method
+        self.additionalHeaders = additionalHeaders
+        self.parameters = parameters
+        self.body = body
+    }
+}
+
+public final class JSONSession: GenericJSONSession<EmptyResponseBody> {}
+
+public class GenericJSONSession<ResponseModel: Decodable>: NSObject, JSONSessionInterface {
+    
+    public typealias ResponseModelType = ResponseModel
+    
+    public var configuration: NetworkConfiguration
+    public var request: Request
     public var session: URLSession?
     public var sessionProvider: URLSessionProvider? = nil
+    public var completion: ResponseCallback
     
     public required init(
-        requestURLPath: String,
-        httpMethod: HTTPMethod = .get,
+        urlPath: String,
+        method: HTTPMethod = .get,
         parameters: [String: String]? = nil,
-        httpBody: Data? = nil,
+        body: Data? = nil,
         configuration: NetworkConfiguration,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) {
-        self.requestURLPath = requestURLPath
-        self.httpMethod = httpMethod
-        self.completion = completion
-        self.configuration = configuration
+        self.request = Request(urlPath: urlPath, method: method, parameters: parameters, body: body)
         self.session = session
-        self.httpBody = httpBody
-        
-        if let parameters = parameters {
-            self.parameters = parameters
-        }
+        self.configuration = configuration
+        self.completion = completion
     }
     
     public func dataTaskClosure() -> (Data?, URLResponse?, Error?) -> Void {
         return { data, response, error in
             var networkError: NetworkError? = nil
+            var responseModel: ResponseModel? = nil
             
             if let error = error {
                 networkError = NetworkError(error: error, response: response as? HTTPURLResponse, payload: data)
             }
             
-            self.completion(response as? HTTPURLResponse, data, networkError, false)
+            if let data = data {
+                responseModel = ModelDecoder<ResponseModel>().decode(jsonData: data, dateDecodingStrategy: .iso8601)
+            }
+            
+            self.completion(response as? HTTPURLResponse, responseModel, networkError, false)
         }
     }
 
