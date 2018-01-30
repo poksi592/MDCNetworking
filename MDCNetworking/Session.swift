@@ -8,8 +8,8 @@
 
 import Foundation
 
-public typealias RequestCompletion = (Any?, HTTPURLResponse?, NetworkError?, _ cancelled: Bool) -> Void
-public typealias DataTaskClosure = (Data?, URLResponse?, Error?) -> Void
+public typealias ResponseCallback = (HTTPURLResponse?, Data?, NetworkError?, _ cancelled: Bool) -> Void
+public typealias DataTaskCallback = (Data?, URLResponse?, Error?) -> Void
 
 public enum HTTPMethod: String {
     case get = "GET"
@@ -25,7 +25,7 @@ public protocol URLSessionProvider {
 
 public protocol CancelableSession: URLSessionDelegate {
     
-    var completion: RequestCompletion { get set }
+    var completion: ResponseCallback { get set }
     var configuration: NetworkConfiguration { get set }
     var requestURLPath: String { get set }
     var httpMethod: HTTPMethod { get set }
@@ -37,7 +37,7 @@ public protocol CancelableSession: URLSessionDelegate {
     
     func start() throws
     func cancel()
-    func dataTaskClosure() -> DataTaskClosure
+    func dataTaskClosure() -> DataTaskCallback
 }
 
 extension CancelableSession {
@@ -48,27 +48,23 @@ extension CancelableSession {
         request.httpMethod = httpMethod.rawValue
         request.httpBody = httpBody
         
-        if session == nil {
-            session = URLSession(configuration: configuration.sessionConfiguration)
-        }
-        
-        let task = session?.dataTask(with: request, completionHandler: dataTaskClosure())
-        
-        task?.resume()
+        (session ?? URLSession(configuration: configuration.sessionConfiguration))
+            .dataTask(with: request, completionHandler: dataTaskClosure())
+            .resume()
     }
     
     public func cancel() {
-        
         if let session = session {
             session.invalidateAndCancel()
-            completion(nil, HTTPURLResponse(), .taskCancelled, false)
+            completion(HTTPURLResponse(), nil, .taskCancelled, false)
         }
     }
 }
 
-public class JSONSession: NSObject, CancelableSession {
+public class HTTPSession: NSObject, CancelableSession {
+    
 
-    public var completion: RequestCompletion
+    public var completion: ResponseCallback
     public var configuration: NetworkConfiguration
     public var requestURLPath: String
     public var httpMethod: HTTPMethod
@@ -85,7 +81,7 @@ public class JSONSession: NSObject, CancelableSession {
         httpBody: Data? = nil,
         configuration: NetworkConfiguration,
         session: URLSession? = nil,
-        completion: @escaping RequestCompletion
+        completion: @escaping ResponseCallback
     ) {
         self.requestURLPath = requestURLPath
         self.httpMethod = httpMethod
@@ -100,36 +96,14 @@ public class JSONSession: NSObject, CancelableSession {
     }
     
     public func dataTaskClosure() -> (Data?, URLResponse?, Error?) -> Void {
-        
-        return { (data, response, error) in
-            
-            var responseObject: [String: Any]? = nil
-            var networkingError: NetworkError? = nil
-            if let data = data {
-                
-                do {
-                    
-                    responseObject = try JSONSerialization.jsonObject(with: data,
-                                                                      options: .mutableContainers) as? [String: Any]
-                }
-                catch {
-                    
-                    networkingError = .serializationFailed
-                }
-            }
+        return { data, response, error in
+            var networkError: NetworkError? = nil
             
             if let error = error {
-
-                if let data = data {
-                    
-                    responseObject = try? JSONSerialization.jsonObject(with: data,
-                                                                       options: .mutableContainers) as! [String: Any]
-                }
-                networkingError = NetworkError(error: error,
-                                               response: response as? HTTPURLResponse,
-                                               serverErrorPayload: responseObject)
+                networkError = NetworkError(error: error, response: response as? HTTPURLResponse, payload: data)
             }
-            self.completion(responseObject, response as? HTTPURLResponse, networkingError, false)
+            
+            self.completion(response as? HTTPURLResponse, data, networkError, false)
         }
     }
 
