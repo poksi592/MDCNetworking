@@ -66,7 +66,7 @@ extension HTTPSessionInterface {
 public struct Request {
     public var urlPath: String
     public var method: HTTPMethod
-    public var additionalHeaders: [String: String] = [:]
+    public var additionalHeaders: [String: String]
     public var parameters: [String: String]?
     public var body: Data?
 }
@@ -88,7 +88,13 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) {
-        self.request = Request(urlPath: urlPath, method: method, parameters: parameters, body: body)
+        self.request = Request(
+            urlPath: urlPath,
+            method: method,
+            additionalHeaders: [:],
+            parameters: parameters,
+            body: body
+        )
         self.configuration = configuration
         self.session = session
         self.completion = completion
