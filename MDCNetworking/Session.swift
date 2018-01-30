@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias ResponseCallback = (HTTPURLResponse?, [String: Any]?, NetworkError?, _ cancelled: Bool) -> Void
+public typealias ResponseCallback = (HTTPURLResponse?, Any?, NetworkError?, _ cancelled: Bool) -> Void
 public typealias DataTaskCallback = (Data?, URLResponse?, Error?) -> Void
 
 public enum HTTPMethod: String {
@@ -104,7 +104,7 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         return { data, response, error in
             
             var networkError: NetworkError? = nil
-            var responseObject: [String: Any]? = nil
+            var responseBody: Any? = nil
             
             if let error = error {
                 networkError = NetworkError(error: error, response: response as? HTTPURLResponse, payload: data)
@@ -112,16 +112,13 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
             
             if let data = data {
                 do {
-                    responseObject = try JSONSerialization.jsonObject(
-                        with: data,
-                        options: .mutableContainers
-                    ) as? [String: Any]
+                    responseBody = try JSONSerialization.jsonObject(with: data)
                 } catch {
                     networkError = .serializationFailed
                 }
             }
         
-            self.completion(response as? HTTPURLResponse, responseObject, networkError, false)
+            self.completion(response as? HTTPURLResponse, responseBody, networkError, false)
         }
     }
 

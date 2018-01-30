@@ -46,7 +46,7 @@ class SessionTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertFalse(wasCancelled)
             
-            let zones = result?["zones"] as? [[String: Any]]
+            let zones = (result as? [String: Any])?["zones"] as? [[String: Any]]
             XCTAssertEqual(zones?.first?["countryCode"] as? String, "GB")
             
             expectationForTest.fulfill()
@@ -92,7 +92,7 @@ class SessionTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertFalse(wasCancelled)
             
-            let zones = result?["zones"] as? [[String: Any]]
+            let zones = (result as? [String: Any])?["zones"] as? [[String: Any]]
             XCTAssertEqual(zones?.first?["countryCode"] as? String, "UK")
             
             expectationForTest.fulfill()
@@ -143,7 +143,7 @@ class SessionTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertFalse(wasCancelled)
             
-            let zones = result?["zones"] as? [[String: Any]]
+            let zones = (result as? [String: Any])?["zones"] as? [[String: Any]]
             XCTAssertEqual(zones?.first?["countryCode"] as? String, "UK")
             
             expectationForTest.fulfill()
