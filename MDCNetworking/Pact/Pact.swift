@@ -60,7 +60,7 @@ public struct Pact: Encodable {
     public struct Response: Encodable {
         
         public let urlResponse: HTTPURLResponse
-        public let body: [String: Any]?
+        public let body: Any?
         
         enum CodingKeys: String, CodingKey {
             case status
@@ -68,7 +68,7 @@ public struct Pact: Encodable {
             case body
         }
         
-        public init(urlResponse: HTTPURLResponse, body: [String: Any]?) {
+        public init(urlResponse: HTTPURLResponse, body: Any?) {
             self.urlResponse = urlResponse
             self.body = body
         }
@@ -78,12 +78,17 @@ public struct Pact: Encodable {
             
             try container.encode(urlResponse.statusCode, forKey: .status)
             try container.encodeIfPresent(urlResponse.allHeaderFields as? [String: String], forKey: .headers)
-            if let body = body {
+            
+            if let body = body as? [String : Any] {
                 var bodyContainer = container.nestedContainer(keyedBy: DynamicKey.self, forKey: .body)
                 
                 for pair in body {
                     try bodyContainer.encode(jsonValue: pair.value, forKey: DynamicKey(stringValue: pair.key)!)
                 }
+            } else if let body = body as? [Any] {
+                var bodyContainer = container.nestedUnkeyedContainer(forKey: .body)
+                
+                try bodyContainer.encode(jsonValue: body)
             }
         }
     }
@@ -231,7 +236,7 @@ public struct PactInteractionFactory {
         path: String,
         parameters: [String: String]? = nil,
         responseStatusCode: Int,
-        responseBody: [String: Any]? = nil
+        responseBody: Any? = nil
     ) -> Pact.Interaction? {
         
         guard
