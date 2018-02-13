@@ -59,7 +59,7 @@ open class PactSessionProvider {
         path: String,
         parameters: [String: String]? = nil,
         responseStatus: Int,
-        responseBody: [String: Any]? = nil
+        responseBody: Any? = nil
     ) throws {
         
         guard let url = URL(schema: schema, host: host, path: path, parameters: parameters) else {
