@@ -10,9 +10,9 @@ import Foundation
 
 open class NetworkClient {
     
-    open private (set) var configuration: NetworkConfiguration
+    open private (set) var configuration: Configuration
     
-    public init(configuration: NetworkConfiguration) {
+    public init(configuration: Configuration) {
         self.configuration = configuration
     }
 }
