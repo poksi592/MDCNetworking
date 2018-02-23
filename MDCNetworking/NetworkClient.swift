@@ -8,27 +8,44 @@
 
 import Foundation
 
+public protocol NetworkClientInterface {
+    func session(
+        path: String,
+        method: HTTPMethod,
+        parameters: [String: String]?,
+        body: Data?,
+        additionalHeaderFields: [String: String]?,
+        session: URLSession?,
+        completion: @escaping ResponseCallback
+    ) throws -> HTTPSession
+}
+
 open class NetworkClient {
 
     open let configuration: Configuration
-    open let sessionProvider: URLSessionProvider?
     
-    public init(configuration: Configuration, sessionProvider: URLSessionProvider? = nil) {
+    public init(configuration: Configuration) {
         self.configuration = configuration
-        self.sessionProvider = sessionProvider
     }
+}
+
+extension NetworkClient: NetworkClientInterface {
     
+    /**
+     * Creates a HTTP session based on provided configuration.
+     */
     open func session(
-        urlPath: String,
+        path: String,
         method: HTTPMethod = .get,
         parameters: [String: String]? = nil,
         body: Data? = nil,
+        additionalHeaderFields: [String: String]? = nil,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) -> HTTPSession {
         
         let session = HTTPSession(
-            urlPath: urlPath,
+            path: path,
             method: method,
             parameters: parameters,
             body: body,
@@ -37,7 +54,7 @@ open class NetworkClient {
             completion: completion
         )
         
-        session.sessionProvider = sessionProvider
+        session.request.additionalHeaderFields = additionalHeaderFields
         
         return session
     }

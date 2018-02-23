@@ -1,5 +1,5 @@
 //
-//  PactStubProvider.swift
+//  PactSessionProvider.swift
 //  MDCNetworking
 //
 //  Created by Bartomiej Nowak on 22/01/2018.

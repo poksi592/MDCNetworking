@@ -39,7 +39,7 @@ public protocol HTTPSessionInterface: URLSessionDelegate {
 extension HTTPSessionInterface {
     
     public func start() throws {
-        var urlRequest = try configuration.request(path: request.urlPath, parameters: request.parameters)
+        var urlRequest = try configuration.request(path: request.path, parameters: request.parameters)
 
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.httpBody = request.body
@@ -51,6 +51,8 @@ extension HTTPSessionInterface {
                 delegateQueue: nil
             )
         }
+        
+        request.additionalHeaderFields?.forEach { urlRequest.addValue($1, forHTTPHeaderField: $0) }
         
         session?.dataTask(with: urlRequest, completionHandler: dataTaskCallback()).resume()
     }
@@ -64,9 +66,9 @@ extension HTTPSessionInterface {
 }
 
 public struct Request {
-    public var urlPath: String
+    public var path: String
     public var method: HTTPMethod
-    public var additionalHeaders: [String: String]
+    public var additionalHeaderFields: [String: String]?
     public var parameters: [String: String]?
     public var body: Data?
 }
@@ -80,18 +82,19 @@ public class HTTPSession: NSObject {
     public var sessionProvider: URLSessionProvider? = nil
     
     public required init(
-        urlPath: String,
+        path: String,
         method: HTTPMethod = .get,
         parameters: [String: String]? = nil,
         body: Data? = nil,
         configuration: Configuration,
+        additionalHeaderFields: [String: String]? = nil,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) {
         self.request = Request(
-            urlPath: urlPath,
+            path: path,
             method: method,
-            additionalHeaders: [:],
+            additionalHeaderFields: additionalHeaderFields,
             parameters: parameters,
             body: body
         )
