@@ -99,6 +99,9 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         self.session = session
         self.completion = completion
     }
+}
+
+extension HTTPSession: HTTPSessionInterface {
     
     public func dataTaskCallback() -> (Data?, URLResponse?, Error?) -> Void {
         return { data, response, error in
@@ -117,59 +120,81 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
                     networkError = .serializationFailed
                 }
             }
-        
+            
             self.completion(response as? HTTPURLResponse, responseBody, networkError, false)
         }
     }
-
+    
     public func urlSession(
         _ session: URLSession,
         didReceive challenge: URLAuthenticationChallenge,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
     ) {
+        /*
+         For reference: https://github.com/iSECPartners/ssl-conservatory
+         */
+        
         switch challenge.protectionSpace.authenticationMethod {
-            case NSURLAuthenticationMethodServerTrust
-            where configuration.sslPinningMode == .certificate && !(configuration.pinnedCertificates?.isEmpty ?? true):
+            case NSURLAuthenticationMethodServerTrust:
+                let trust = challenge.protectionSpace.serverTrust!
+                let hostname = challenge.protectionSpace.host as CFString
                 
-                verifyPinnedCertificates(for: challenge, completionHandler: completionHandler)
+                guard isCertificateChainValid(with: trust) else {
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                    return
+                }
+                
+                if configuration.sslPinningMode == .certificate {
+                    verifyWithPinnedCertificates(trust, hostname: hostname, completionHandler: completionHandler)
+                } else {
+                    completionHandler(.useCredential, URLCredential(trust: trust))
+                }
+            
             default:
                 completionHandler(.performDefaultHandling, nil)
         }
     }
     
     /**
-     Performs SSL domain and leaf certificate validation.
+     Validates the certificate chain with the device's trust store.
      */
-    private func verifyPinnedCertificates(
-        for challenge: URLAuthenticationChallenge,
+    private func isCertificateChainValid(with trust: SecTrust) -> Bool {
+        var result: SecTrustResultType = .invalid
+        SecTrustEvaluate(trust, &result)
+        return result == .unspecified || result == .proceed
+    }
+    
+    /**
+     Performs matching with pinned certificates.
+     */
+    private func verifyWithPinnedCertificates(
+        _ trust: SecTrust,
+        hostname: CFString,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
     ) {
         guard let pinnedCertificates = configuration.pinnedCertificates else {
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-        
-        SecTrustSetPolicies(
-            challenge.protectionSpace.serverTrust!,
-            [SecPolicyCreateSSL(true, (challenge.protectionSpace.host as CFString))] as NSArray
-        )
-        
-        var result: SecTrustResultType = .invalid
-        SecTrustEvaluate(challenge.protectionSpace.serverTrust!, &result)
-        
-        guard result == .unspecified || result == .proceed else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
         
-        let certificate = SecTrustGetCertificateAtIndex(challenge.protectionSpace.serverTrust!, 0)
-        let remoteCertificate = SecCertificateCopyData(certificate!) as NSData as Data
+        SecTrustSetPolicies(trust, [SecPolicyCreateSSL(true, hostname)] as NSArray)
         
-        if pinnedCertificates.contains(remoteCertificate) {
-            completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+        if isLeafCertificateMatchingAnyPinnedCertificates(from: trust, with: pinnedCertificates) {
+            completionHandler(.useCredential, URLCredential(trust: trust))
         } else {
             completionHandler(.cancelAuthenticationChallenge, nil)
         }
+    }
+    
+    /**
+     Attempts to match the leaf certificate extracted from trust object to any of provided pinned certificates.
+     */
+    private func isLeafCertificateMatchingAnyPinnedCertificates(
+        from serverTrust: SecTrust,
+        with pinnedCertificates: [Data]
+    ) -> Bool {
+        let leafCertificate = SecCertificateCopyData(SecTrustGetCertificateAtIndex(serverTrust, 0)!) as NSData as Data
+        return pinnedCertificates.contains(leafCertificate)
     }
 }
 

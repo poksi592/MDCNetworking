@@ -9,7 +9,7 @@
 import Foundation
 
 open class NetworkClient {
-    
+
     open let configuration: Configuration
     open let sessionProvider: URLSessionProvider?
     
