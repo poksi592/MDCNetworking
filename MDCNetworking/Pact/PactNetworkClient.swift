@@ -29,7 +29,7 @@ public protocol InteractionStubbable {
  *
  * [Pact specification can be found here](https://github.com/pact-foundation/pact-specification/tree/version-2).
  */
-open class PactNetworkClient {
+open class PactNetworkClient: NetworkClientInterface, InteractionStubbable {
     
     open let configuration: Configuration
     open let sessionProvider: PactSessionProvider
@@ -38,9 +38,6 @@ open class PactNetworkClient {
         self.configuration = configuration
         self.sessionProvider = sessionProvider
     }
-}
-
-extension PactNetworkClient: NetworkClientInterface {
     
     /**
      * Creates a `HTTPSession` based on provided `Configuration` which response will be stubbed if matching
@@ -79,9 +76,6 @@ extension PactNetworkClient: NetworkClientInterface {
         
         return session
     }
-}
-
-extension PactNetworkClient: InteractionStubbable {
     
     /**
      * Stubs the response for selected request.

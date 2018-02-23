@@ -20,17 +20,14 @@ public protocol NetworkClientInterface {
     ) throws -> HTTPSession
 }
 
-open class NetworkClient {
+open class NetworkClient: NetworkClientInterface {
 
     open let configuration: Configuration
     
     public init(configuration: Configuration) {
         self.configuration = configuration
     }
-}
 
-extension NetworkClient: NetworkClientInterface {
-    
     /**
      * Creates a HTTP session based on provided configuration.
      */
