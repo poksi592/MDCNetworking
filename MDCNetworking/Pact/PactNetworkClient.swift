@@ -24,12 +24,17 @@ public protocol InteractionStubbable {
 }
 
 /**
+ * Network client with interface for adding stubbed interactions.
+ */
+public protocol PactNetworkClientInterface: NetworkClientInterface, InteractionStubbable {}
+
+/**
  * Network client with the possibility of stubbing selected request responses using Pact interactions. Gathers all
  * interactions into a Pact model ready for serialization and sending to a contract broker or repository.
  *
  * [Pact specification can be found here](https://github.com/pact-foundation/pact-specification/tree/version-2).
  */
-open class PactNetworkClient: NetworkClientInterface, InteractionStubbable {
+open class PactNetworkClient: PactNetworkClientInterface {
     
     open let configuration: Configuration
     open let sessionProvider: PactSessionProvider
