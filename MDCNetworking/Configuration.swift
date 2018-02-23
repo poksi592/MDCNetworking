@@ -21,7 +21,6 @@ public struct Configuration {
 
     let baseUrl: URL
     let additionalHeaders: [String: String]
-    let timeout: TimeInterval
     let sessionConfiguration: URLSessionConfiguration
     let sslPinningMode: SSLPinningMode
     let pinnedCertificates: [Data]?
@@ -30,7 +29,6 @@ public struct Configuration {
         scheme: String,
         host: String,
         additionalHeaders: [String: String]? = nil,
-        timeout: TimeInterval = 60,
         sessionConfiguration: URLSessionConfiguration = .default,
         sslPinningMode: SSLPinningMode = .default,
         pinnedCertificates: [Data]? = nil
@@ -48,25 +46,27 @@ public struct Configuration {
         self.baseUrl = baseUrl
         
         self.additionalHeaders = additionalHeaders ?? [:]
-        self.timeout = timeout
         self.sessionConfiguration = sessionConfiguration
-        self.sessionConfiguration.timeoutIntervalForRequest = timeout
         self.sslPinningMode = sslPinningMode
         self.pinnedCertificates = pinnedCertificates
     }
     
-    func request(path: String, parameters: [String: String]?) throws -> URLRequest {
+    func request(path: String, parameters: [String: String]? = nil) throws -> URLRequest {
+
+        let correctedPath: String
         
-        guard let percentEncodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            throw PathPercentEncodingError()
+        if path.prefix(1) != "/" {
+            correctedPath = "/" + path
+        } else {
+            correctedPath = path
         }
         
         var components = URLComponents()
         
         components.scheme = baseUrl.scheme
         components.host = baseUrl.host
-        components.path = percentEncodedPath
-        components.queryItems = parameters?.flatMap(URLQueryItem.init)
+        components.path = correctedPath
+        components.queryItems = parameters?.flatMap(URLQueryItem.init) ?? []
         
         guard let requestUrl = components.url else {
             throw UrlConstructionError()

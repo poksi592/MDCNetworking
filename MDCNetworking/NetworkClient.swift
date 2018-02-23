@@ -13,7 +13,7 @@ open class NetworkClient {
     open let configuration: Configuration
     open let sessionProvider: URLSessionProvider?
     
-    public init(configuration: Configuration, sessionProvider: URLSessionProvider?) {
+    public init(configuration: Configuration, sessionProvider: URLSessionProvider? = nil) {
         self.configuration = configuration
         self.sessionProvider = sessionProvider
     }
