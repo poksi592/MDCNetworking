@@ -130,6 +130,7 @@ extension HTTPSession: HTTPSessionInterface {
         didReceive challenge: URLAuthenticationChallenge,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
     ) {
+        
         /*
          For reference: https://github.com/iSECPartners/ssl-conservatory
          */
@@ -149,7 +150,6 @@ extension HTTPSession: HTTPSessionInterface {
                 } else {
                     completionHandler(.useCredential, URLCredential(trust: trust))
                 }
-            
             default:
                 completionHandler(.performDefaultHandling, nil)
         }
