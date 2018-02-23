@@ -39,7 +39,7 @@ open class NetworkClient: NetworkClientInterface {
         additionalHeaderFields: [String: String]? = nil,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
-    ) -> HTTPSession {
+    ) throws -> HTTPSession {
         
         let session = HTTPSession(
             path: path,
