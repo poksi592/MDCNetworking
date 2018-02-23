@@ -73,7 +73,7 @@ public struct Request {
     public var body: Data?
 }
 
-public class HTTPSession: NSObject {
+public class HTTPSession: NSObject, HTTPSessionInterface {
     
     public var completion: ResponseCallback
     public var configuration: Configuration
@@ -102,9 +102,6 @@ public class HTTPSession: NSObject {
         self.session = session
         self.completion = completion
     }
-}
-
-extension HTTPSession: HTTPSessionInterface {
     
     public func dataTaskCallback() -> (Data?, URLResponse?, Error?) -> Void {
         return { data, response, error in
@@ -133,7 +130,6 @@ extension HTTPSession: HTTPSessionInterface {
         didReceive challenge: URLAuthenticationChallenge,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
     ) {
-        
         /*
          For reference: https://github.com/iSECPartners/ssl-conservatory
          */
