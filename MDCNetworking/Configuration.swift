@@ -8,34 +8,51 @@
 
 import Foundation
 
+public enum SSLPinningMode {
+    case `default`
+    case certificate
+}
+
 public struct Configuration {
     
+    public struct InvalidSchemeOrHost: Error {}
     public struct UrlConstructionError: Error {}
     public struct PathPercentEncodingError: Error {}
 
-    let host: URL
+    let baseUrl: URL
     let additionalHeaders: [String: String]
     let timeout: TimeInterval
     let sessionConfiguration: URLSessionConfiguration
-    let certificatesPathsForResource: [String]?
+    let sslPinningMode: SSLPinningMode
+    let pinnedCertificates: [Data]?
 
-    public init?(
+    public init(
+        scheme: String,
         host: String,
         additionalHeaders: [String: String]? = nil,
         timeout: TimeInterval = 60,
         sessionConfiguration: URLSessionConfiguration = .default,
-        certificatesPathsForResource: [String]? = nil
-    ) {
-        guard let host = URL(string: host) else {
-            return nil
+        sslPinningMode: SSLPinningMode = .default,
+        pinnedCertificates: [Data]? = nil
+    ) throws {
+        
+        var components = URLComponents()
+        
+        components.scheme = scheme
+        components.host = host
+        
+        guard let baseUrl = components.url else {
+            throw InvalidSchemeOrHost()
         }
         
-        self.host = host
+        self.baseUrl = baseUrl
+        
         self.additionalHeaders = additionalHeaders ?? [:]
         self.timeout = timeout
         self.sessionConfiguration = sessionConfiguration
         self.sessionConfiguration.timeoutIntervalForRequest = timeout
-        self.certificatesPathsForResource = certificatesPathsForResource
+        self.sslPinningMode = sslPinningMode
+        self.pinnedCertificates = pinnedCertificates
     }
     
     func request(path: String, parameters: [String: String]?) throws -> URLRequest {
@@ -44,22 +61,20 @@ public struct Configuration {
             throw PathPercentEncodingError()
         }
         
-        let expandedPath: String
-        if let parametersString = parameters?.URLParameters() {
-            expandedPath = percentEncodedPath + "?" + parametersString
-        } else {
-            expandedPath = percentEncodedPath
-        }
+        var components = URLComponents()
         
-        guard let requestURL = URL(string: expandedPath, relativeTo: host) else {
+        components.scheme = baseUrl.scheme
+        components.host = baseUrl.host
+        components.path = percentEncodedPath
+        components.queryItems = parameters?.flatMap(URLQueryItem.init)
+        
+        guard let requestUrl = components.url else {
             throw UrlConstructionError()
         }
         
-        var request = URLRequest(url: requestURL)
+        var request = URLRequest(url: requestUrl)
         
-        for (key, value) in additionalHeaders {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
+        additionalHeaders.forEach { request.setValue($1, forHTTPHeaderField: $0) }
         
         return request
     }
