@@ -66,7 +66,9 @@ public struct Configuration {
         components.scheme = baseUrl.scheme
         components.host = baseUrl.host
         components.path = correctedPath
-        components.queryItems = parameters?.flatMap(URLQueryItem.init) ?? []
+        if let parameters = parameters {
+            components.queryItems = parameters.flatMap(URLQueryItem.init)
+        }
         
         guard let requestUrl = components.url else {
             throw UrlConstructionError()
