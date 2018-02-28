@@ -25,7 +25,7 @@ public protocol URLSessionProvider {
 
 public protocol HTTPSessionInterface: URLSessionDelegate {
     
-    var configuration: NetworkConfiguration { get set }
+    var configuration: Configuration { get set }
     var request: Request { get set }
     weak var session: URLSession? { get set }
     var sessionProvider: URLSessionProvider? { get set }
@@ -74,7 +74,7 @@ public struct Request {
 public class HTTPSession: NSObject, HTTPSessionInterface {
     
     public var completion: ResponseCallback
-    public var configuration: NetworkConfiguration
+    public var configuration: Configuration
     public var request: Request
     public var session: URLSession?
     public var sessionProvider: URLSessionProvider? = nil
@@ -84,7 +84,7 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         method: HTTPMethod = .get,
         parameters: [String: String]? = nil,
         body: Data? = nil,
-        configuration: NetworkConfiguration,
+        configuration: Configuration,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) {

@@ -17,7 +17,7 @@
 		6DA77EFC1E02FEA800D3E3B1 /* MDCNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */; };
 		6DA77F081E0404B300D3E3B1 /* NetworkingErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F071E0404B300D3E3B1 /* NetworkingErrorTests.swift */; };
-		6DA77F0A1E07E06E00D3E3B1 /* NetworkConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F091E07E06E00D3E3B1 /* NetworkConfiguration.swift */; };
+		6DA77F0A1E07E06E00D3E3B1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F091E07E06E00D3E3B1 /* Configuration.swift */; };
 		6DA77F0C1E07F81E00D3E3B1 /* ConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F0B1E07F81E00D3E3B1 /* ConfigurationTests.swift */; };
 		6DA77F0E1E08022F00D3E3B1 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F0D1E08022F00D3E3B1 /* ClientTests.swift */; };
 		6DA77F101E0802B500D3E3B1 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F0F1E0802B500D3E3B1 /* NetworkClient.swift */; };
@@ -54,7 +54,7 @@
 		6DA77EFB1E02FEA800D3E3B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		6DA77F071E0404B300D3E3B1 /* NetworkingErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingErrorTests.swift; sourceTree = "<group>"; };
-		6DA77F091E07E06E00D3E3B1 /* NetworkConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkConfiguration.swift; sourceTree = "<group>"; };
+		6DA77F091E07E06E00D3E3B1 /* Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		6DA77F0B1E07F81E00D3E3B1 /* ConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
 		6DA77F0D1E08022F00D3E3B1 /* ClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientTests.swift; sourceTree = "<group>"; };
 		6DA77F0F1E0802B500D3E3B1 /* NetworkClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 				6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */,
 				6DA77EEF1E02FEA800D3E3B1 /* Info.plist */,
 				6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */,
-				6DA77F091E07E06E00D3E3B1 /* NetworkConfiguration.swift */,
+				6DA77F091E07E06E00D3E3B1 /* Configuration.swift */,
 				6DA77F0F1E0802B500D3E3B1 /* NetworkClient.swift */,
 				6DA77F111E08250400D3E3B1 /* Session.swift */,
 				60300C47200F792800AF7A0A /* DynamicCoding.swift */,
@@ -266,7 +266,7 @@
 				60300C48200F792800AF7A0A /* DynamicCoding.swift in Sources */,
 				60300C4C200F7A1E00AF7A0A /* URL+Utilities.swift in Sources */,
 				6DA77F121E08250400D3E3B1 /* Session.swift in Sources */,
-				6DA77F0A1E07E06E00D3E3B1 /* NetworkConfiguration.swift in Sources */,
+				6DA77F0A1E07E06E00D3E3B1 /* Configuration.swift in Sources */,
 				6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */,
 				60300C46200F78DD00AF7A0A /* Pact.swift in Sources */,
 				6DA77F101E0802B500D3E3B1 /* NetworkClient.swift in Sources */,
