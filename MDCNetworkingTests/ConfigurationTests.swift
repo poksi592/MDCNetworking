@@ -11,60 +11,112 @@ import XCTest
 
 class ConfigurationTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    // MARK: - Initialization
+    
+    func test_Initialization_DefaultValues() {
+        guard let configuration = try? Configuration(scheme: "https", host: "mock-host") else {
+            XCTFail("Failed to initialize configuration.")
+            return
+        }
+        
+        XCTAssertEqual(configuration.baseUrl.scheme, "https")
+        XCTAssertEqual(configuration.baseUrl.host, "mock-host")
+        XCTAssertTrue(configuration.additionalHeaders.isEmpty)
+        XCTAssertEqual(configuration.sessionConfiguration, .default)
     }
     
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
+    func test_Initialization() {
+        let customConfiguration = URLSessionConfiguration.ephemeral
+        
+        customConfiguration.timeoutIntervalForRequest = 33
+        
+        guard
+            let configuration = try? Configuration(
+                scheme: "https",
+                host: "mock-host",
+                additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
+                sessionConfiguration: customConfiguration,
+                sslPinningMode: .certificate,
+                pinnedCertificates: ["mock-data".data(using: .utf8)!]
+            ),
+            let pinnedCerts = configuration.pinnedCertificates
+        else {
+            XCTFail("Failed to initialize configuration.")
+            return
+        }
+        
+        XCTAssertEqual(configuration.baseUrl.scheme, "https")
+        XCTAssertEqual(configuration.baseUrl.host, "mock-host")
+        XCTAssertEqual(configuration.additionalHeaders.count, 2)
+        XCTAssertEqual(configuration.sessionConfiguration.timeoutIntervalForRequest, 33)
+        XCTAssertEqual(configuration.sslPinningMode, .certificate)
+        XCTAssertEqual(pinnedCerts, ["mock-data".data(using: .utf8)!])
     }
     
-    func testInstantiation() {
-        
-        // Designated initializer
-        let session1 = NetworkConfiguration(host: "https://somehost")
-        XCTAssertEqual(session1?.host.description, "https://somehost")
-        
-        // Additional headers
-        let session2 = NetworkConfiguration(host: "https://somehost",
-                                            additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"])
-        XCTAssertEqual(session2?.additionalHeaders.count, 2)
-        
-        // Timeout
-        let session3 = NetworkConfiguration(host: "https://somehost",
-                                            additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"], timeout: 20)
-        XCTAssertEqual(session3?.timeout, 20)
-        
-        // Session configuration
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        let session4 = NetworkConfiguration(host: "https://somehost",
-                                            additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
-                                            timeout: 20,
-                                            sessionConfiguration: configuration)
-        XCTAssertEqual(session4?.sessionConfiguration.timeoutIntervalForRequest, 20)
+    // MARK: - Requests
+    
+    func test_URLRequest() {
+        do {
+            let configuration = try Configuration(scheme: "https", host: "mock-host")
+            let request = try configuration.request(path: "/mock-path", parameters: nil)
+            
+            XCTAssertEqual(request.url?.scheme, "https")
+            XCTAssertEqual(request.url?.host, "mock-host")
+            XCTAssertEqual(request.url?.path, "/mock-path")
+            XCTAssertEqual(request.url?.query, "")
+        } catch {
+            XCTFail("Failed to initialize configuration or request with error: \(error)")
+        }
     }
     
-    func testURLRequest() {
-        
-        // basic request
-        var session = NetworkConfiguration(host: "https://somehost")
-        var request = try! session!.request(path: "path", parameters: nil)
-
-        XCTAssertEqual(request.description, "https://somehost/path")
-        
-        // Single parameter
-        session = NetworkConfiguration(host: "https://somehost")
-        request = try! session!.request(path: "path", parameters: ["parameter": "value"])
-        
-        XCTAssertEqual(request.description, "https://somehost/path?parameter=value")
-        
-        // Two parameters
-        session = NetworkConfiguration(host: "https://somehost")
-        request = try! session!.request(path: "path", parameters: ["parameter": "value", "parameter1": "value1"])
-        
-        XCTAssertEqual(request.description, "https://somehost/path?parameter=value&parameter1=value1")
+    func test_URLRequest_MissingSlashInPath_ShouldBeCorrected() {
+        do {
+            let configuration = try Configuration(scheme: "https", host: "mock-host")
+            let request = try configuration.request(path: "mock-path", parameters: nil)
+            
+            XCTAssertEqual(request.url?.scheme, "https")
+            XCTAssertEqual(request.url?.host, "mock-host")
+            XCTAssertEqual(request.url?.path, "/mock-path")
+            XCTAssertEqual(request.url?.query, "")
+        } catch {
+            XCTFail("Failed to initialize configuration or request with error: \(error)")
+        }
+    }
+    
+    func test_URLRequest_QueryItems() {
+        do {
+            let configuration = try Configuration(scheme: "https", host: "mock-host")
+            let request = try configuration.request(
+                path: "/mock-path",
+                parameters: ["mock-param" : "mock-value", "mock-param-2" : "mock-value-2"]
+            )
+            
+            XCTAssertEqual(request.url?.scheme, "https")
+            XCTAssertEqual(request.url?.host, "mock-host")
+            XCTAssertEqual(request.url?.path, "/mock-path")
+            XCTAssertTrue(request.url?.query?.contains("mock-param=mock-value") ?? false)
+            XCTAssertTrue(request.url?.query?.contains("mock-param-2=mock-value-2") ?? false)
+        } catch {
+            XCTFail("Failed to initialize configuration or request with error: \(error)")
+        }
+    }
+    
+    func test_URLRequest_AdditionalHeaders() {
+        do {
+            let configuration = try Configuration(
+                scheme: "https",
+                host: "mock-host",
+                additionalHeaders: ["mock-header": "mock-value", "mock-header-2": "mock-value-2"]
+            )
+            let request = try configuration.request(path: "/mock-path", parameters: nil)
+            
+            XCTAssertEqual(request.url?.scheme, "https")
+            XCTAssertEqual(request.url?.host, "mock-host")
+            XCTAssertEqual(request.url?.path, "/mock-path")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "mock-header"), "mock-value")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "mock-header-2"), "mock-value-2")
+        } catch {
+            XCTFail("Failed to initialize configuration or request with error: \(error)")
+        }
     }
 }

@@ -14,9 +14,9 @@ class SessionTests: XCTestCase {
     func testInitialising() {
     
         // Test with default GET method
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let session1 = HTTPSession(
-            urlPath: "https://somehost",
+            path: "https://somehost",
             configuration: configuration!
         ) { _, _, _, _ in }
         
@@ -32,12 +32,12 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         
         // Execute and test
         let session1 = HTTPSession(
-            urlPath: "/v2/list-time-zone",
+            path: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
             configuration: configuration!
@@ -69,7 +69,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
@@ -82,7 +82,7 @@ class SessionTests: XCTestCase {
         
         // Execute and test
         let session1 = HTTPSession(
-            urlPath: "/v2/list-time-zone",
+            path: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
             configuration: configuration!,
@@ -115,7 +115,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
@@ -133,7 +133,7 @@ class SessionTests: XCTestCase {
         
         // Execute and test
         let session1 = HTTPSession(
-            urlPath: "/v2/list-time-zone",
+            path: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
             configuration: configuration!,
@@ -166,7 +166,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
@@ -180,7 +180,7 @@ class SessionTests: XCTestCase {
         
         // Execute and test
         let session1 = HTTPSession(
-            urlPath: "/v2/list-time-zone",
+            path: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
             configuration: configuration!,
