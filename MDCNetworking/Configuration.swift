@@ -9,7 +9,7 @@
 import Foundation
 
 public enum SSLPinningMode {
-    case `default`
+    case none
     case certificate
 }
 
@@ -32,7 +32,7 @@ public struct Configuration {
         additionalHeaders: [String: String]? = nil,
         timeout: TimeInterval = 60,
         sessionConfiguration: URLSessionConfiguration = .default,
-        sslPinningMode: SSLPinningMode = .default,
+        sslPinningMode: SSLPinningMode = .none,
         pinnedCertificates: [Data]? = nil
     ) throws {
         
@@ -57,17 +57,16 @@ public struct Configuration {
     
     func request(path: String, parameters: [String: String]?) throws -> URLRequest {
         
-        guard let percentEncodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            throw PathPercentEncodingError()
-        }
-        
         var components = URLComponents()
         
         components.scheme = baseUrl.scheme
         components.host = baseUrl.host
-        components.path = percentEncodedPath
-        components.queryItems = parameters?.flatMap(URLQueryItem.init)
+        components.path = path
         
+        if let parameters = parameters {
+            components.queryItems = parameters.flatMap(URLQueryItem.init)
+        }
+
         guard let requestUrl = components.url else {
             throw UrlConstructionError()
         }

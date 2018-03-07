@@ -99,9 +99,6 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         self.session = session
         self.completion = completion
     }
-}
-
-extension HTTPSession: HTTPSessionInterface {
     
     public func dataTaskCallback() -> (Data?, URLResponse?, Error?) -> Void {
         return { data, response, error in

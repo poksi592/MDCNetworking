@@ -13,8 +13,8 @@ class ClientTests: XCTestCase {
     
     func testClientInitialization() {
         // Test with configuration
-        let session1 = NetworkConfiguration(host: "https://somehost")
-        let client1 = NetworkClient(configuration: session1!)
+        let session1 = try? Configuration(scheme: "https", host: "somehost")
+        let client1 = NetworkClient(configuration: session1!, sessionProvider: nil)
         XCTAssertNotNil(client1)
         XCTAssertNotNil(client1.configuration)
     }
