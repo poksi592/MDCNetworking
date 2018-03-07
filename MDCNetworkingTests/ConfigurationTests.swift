@@ -24,46 +24,46 @@ class ConfigurationTests: XCTestCase {
     func testInstantiation() {
         
         // Designated initializer
-        let session1 = try? Configuration(scheme: "https", host: "somehost")
-        XCTAssertEqual(session1?.baseUrl.host?.description, "somehost")
+        let session1 = Configuration(baseUrl: URL(string: "https://somehost")!)
+        XCTAssertEqual(session1.baseUrl.host?.description, "somehost")
         
         // Additional headers
-        let session2 = try? Configuration(scheme: "https", host: "somehost",
+        let session2 = Configuration(baseUrl: URL(string: "https://somehost")!,
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"])
-        XCTAssertEqual(session2?.additionalHeaders.count, 2)
+        XCTAssertEqual(session2.additionalHeaders.count, 2)
         
         // Timeout
-        let session3 = try? Configuration(scheme: "https", host: "somehost",
+        let session3 = Configuration(baseUrl: URL(string: "https://somehost")!,
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"], timeout: 20)
-        XCTAssertEqual(session3?.timeout, 20)
+        XCTAssertEqual(session3.timeout, 20)
         
         // Session configuration
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
-        let session4 = try? Configuration(scheme: "https", host: "somehost",
+        let session4 = Configuration(baseUrl: URL(string: "https://somehost")!,
                                             additionalHeaders: ["Accept-Encoding":"gzip", "Content-Type":"application/json"],
                                             timeout: 20,
                                             sessionConfiguration: configuration)
-        XCTAssertEqual(session4?.sessionConfiguration.timeoutIntervalForRequest, 20)
+        XCTAssertEqual(session4.sessionConfiguration.timeoutIntervalForRequest, 20)
     }
     
     func testURLRequest() {
         
         // basic request
-        var session = try? Configuration(scheme: "https", host: "somehost")
-        var request = try! session!.request(path: "/path", parameters: nil)
+        var session = Configuration(baseUrl: URL(string: "https://somehost")!)
+        var request = try! session.request(path: "/path", parameters: nil)
 
         XCTAssertEqual(request.description, "https://somehost/path")
         
         // Single parameter
-        session = try? Configuration(scheme: "https", host: "somehost")
-        request = try! session!.request(path: "/path", parameters: ["parameter": "value"])
+        session = Configuration(baseUrl: URL(string: "https://somehost")!)
+        request = try! session.request(path: "/path", parameters: ["parameter": "value"])
         
         XCTAssertEqual(request.description, "https://somehost/path?parameter=value")
         
         // Two parameters
-        session = try? Configuration(scheme: "https", host: "somehost")
-        request = try! session!.request(path: "/path", parameters: ["parameter": "value", "parameter1": "value1"])
+        session = Configuration(baseUrl: URL(string: "https://somehost")!)
+        request = try! session.request(path: "/path", parameters: ["parameter": "value", "parameter1": "value1"])
         
         XCTAssertEqual(request.description, "https://somehost/path?parameter=value&parameter1=value1")
     }

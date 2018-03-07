@@ -15,7 +15,7 @@ public enum SSLPinningMode {
 
 public struct Configuration {
     
-    public struct InvalidSchemeOrHost: Error {}
+    public struct InvalidBaseUrl: Error {}
     public struct UrlConstructionError: Error {}
     public struct PathPercentEncodingError: Error {}
 
@@ -27,26 +27,14 @@ public struct Configuration {
     let pinnedCertificates: [Data]?
 
     public init(
-        scheme: String,
-        host: String,
+        baseUrl: URL,
         additionalHeaders: [String: String]? = nil,
         timeout: TimeInterval = 60,
         sessionConfiguration: URLSessionConfiguration = .default,
         sslPinningMode: SSLPinningMode = .none,
         pinnedCertificates: [Data]? = nil
-    ) throws {
-        
-        var components = URLComponents()
-        
-        components.scheme = scheme
-        components.host = host
-        
-        guard let baseUrl = components.url else {
-            throw InvalidSchemeOrHost()
-        }
-        
+    ) {
         self.baseUrl = baseUrl
-        
         self.additionalHeaders = additionalHeaders ?? [:]
         self.timeout = timeout
         self.sessionConfiguration = sessionConfiguration
@@ -57,10 +45,10 @@ public struct Configuration {
     
     func request(path: String, parameters: [String: String]?) throws -> URLRequest {
         
-        var components = URLComponents()
+        guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
+            throw InvalidBaseUrl()
+        }
         
-        components.scheme = baseUrl.scheme
-        components.host = baseUrl.host
         components.path = path
         
         if let parameters = parameters {
