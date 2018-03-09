@@ -45,16 +45,22 @@ public struct Configuration {
     
     func request(path: String, parameters: [String: String]?) throws -> URLRequest {
         
+        var mutablePath = path
+        
+        if mutablePath.first != "/" {
+            mutablePath.insert("/", at: mutablePath.startIndex)
+        }
+        
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: true) else {
             throw InvalidBaseUrl()
         }
         
-        components.path = path
+        components.path = baseUrl.path + mutablePath
         
         if let parameters = parameters {
             components.queryItems = parameters.flatMap(URLQueryItem.init)
         }
-
+        
         guard let requestUrl = components.url else {
             throw UrlConstructionError()
         }
