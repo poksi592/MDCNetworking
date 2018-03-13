@@ -8,6 +8,10 @@
 
 import Foundation
 
+public struct InvalidBaseUrl: Error {}
+public struct UrlConstructionError: Error {}
+public struct PathPercentEncodingError: Error {}
+
 public typealias ResponseCallback = (HTTPURLResponse?, Any?, NetworkError?, _ cancelled: Bool) -> Void
 public typealias DataTaskCallback = (Data?, URLResponse?, Error?) -> Void
 
@@ -39,17 +43,11 @@ public protocol HTTPSessionInterface: URLSessionDelegate {
 extension HTTPSessionInterface {
     
     public func start() throws {
-        var urlRequest = try configuration.request(path: request.urlPath, parameters: request.parameters)
-
-        urlRequest.httpMethod = request.method.rawValue
-        urlRequest.httpBody = request.body
+        let url = try generateUrl()
+        let urlRequest = generateUrlRequest(url: url)
         
         if session == nil {
-            session = sessionProvider?.session(for: urlRequest) ?? URLSession(
-                configuration: configuration.sessionConfiguration,
-                delegate: self,
-                delegateQueue: nil
-            )
+            session = generateSession(request: urlRequest)
         }
         
         session?.dataTask(with: urlRequest, completionHandler: dataTaskCallback()).resume()
@@ -60,6 +58,50 @@ extension HTTPSessionInterface {
             session.invalidateAndCancel()
             completion(HTTPURLResponse(), nil, .taskCancelled, false)
         }
+    }
+    
+    func generateUrl() throws -> URL {
+        var additionalPath = request.urlPath
+        
+        if additionalPath.first != "/" {
+            additionalPath.insert("/", at: additionalPath.startIndex)
+        }
+        
+        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
+            throw InvalidBaseUrl()
+        }
+        
+        components.path = configuration.baseUrl.path + additionalPath
+
+        if let parameters = request.parameters, !parameters.isEmpty {
+            components.queryItems = parameters.flatMap(URLQueryItem.init)
+        }
+        
+        guard let requestUrl = components.url else {
+            throw UrlConstructionError()
+        }
+        
+        return requestUrl
+    }
+    
+    func generateUrlRequest(url: URL) -> URLRequest {
+        var urlRequest = URLRequest(url: url)
+        
+        urlRequest.httpMethod = request.method.rawValue
+        urlRequest.httpBody = request.body
+        
+        configuration.httpHeaders.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
+        request.additionalHeaders.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
+        
+        return urlRequest
+    }
+    
+    func generateSession(request: URLRequest) -> URLSession {
+        return sessionProvider?.session(for: request) ?? URLSession(
+            configuration: configuration.sessionConfiguration,
+            delegate: self,
+            delegateQueue: nil
+        )
     }
 }
 
@@ -82,8 +124,6 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
     public required init(
         urlPath: String,
         method: HTTPMethod = .get,
-        parameters: [String: String]? = nil,
-        body: Data? = nil,
         configuration: Configuration,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
@@ -92,8 +132,8 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
             urlPath: urlPath,
             method: method,
             additionalHeaders: [:],
-            parameters: parameters,
-            body: body
+            parameters: nil,
+            body: nil
         )
         self.configuration = configuration
         self.session = session

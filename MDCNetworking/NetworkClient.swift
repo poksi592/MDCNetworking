@@ -30,13 +30,13 @@ open class NetworkClient {
         let session = HTTPSession(
             urlPath: urlPath,
             method: method,
-            parameters: parameters,
-            body: body,
             configuration: configuration,
             session: session,
             completion: completion
         )
         
+        session.request.parameters = parameters
+        session.request.body = body
         session.sessionProvider = sessionProvider
         
         return session
