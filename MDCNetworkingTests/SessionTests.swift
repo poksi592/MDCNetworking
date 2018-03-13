@@ -14,7 +14,7 @@ class SessionTests: XCTestCase {
     func testInitialising() {
     
         // Test with default GET method
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let session1 = HTTPSession(
             urlPath: "https://somehost",
             configuration: configuration!
@@ -32,7 +32,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         
         // Execute and test
@@ -69,7 +69,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
@@ -115,7 +115,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
@@ -166,7 +166,7 @@ class SessionTests: XCTestCase {
         
         // Prepare without Configuration object set
         let expectationForTest = expectation(description: "test")
-        let configuration = NetworkConfiguration(host: "http://api.timezonedb.com/")
+        let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
         let parameters = ["key": "1S2RMN6YBMYA", "format": "json", "country": "GB"]
         
         // Prepare stubbed session
