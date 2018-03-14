@@ -26,7 +26,6 @@ open class NetworkClient {
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
     ) -> HTTPSession {
-        
         let session = HTTPSession(
             urlPath: urlPath,
             method: method,
