@@ -29,6 +29,20 @@ public struct Request {
     public var additionalHeaders: [String: String]
     public var parameters: [String: String]?
     public var body: Data?
+    
+    public init(
+        urlPath: String,
+        method: HTTPMethod,
+        additionalHeaders: [String: String],
+        parameters: [String: String]?,
+        body: Data?
+    ) {
+        self.urlPath = urlPath
+        self.method = method
+        self.additionalHeaders = additionalHeaders
+        self.parameters = parameters
+        self.body = body
+    }
 }
 
 public protocol HTTPSessionInterface: URLSessionDelegate {
