@@ -23,8 +23,29 @@ public protocol URLSessionProvider {
     func session(for urlRequest: URLRequest) -> URLSession?
 }
 
-public protocol HTTPSessionInterface: URLSessionDelegate {
+public struct Request {
+    public var urlPath: String
+    public var method: HTTPMethod
+    public var additionalHeaders: [String: String]
+    public var parameters: [String: String]?
+    public var body: Data?
     
+    public init(
+        urlPath: String,
+        method: HTTPMethod,
+        additionalHeaders: [String: String],
+        parameters: [String: String]?,
+        body: Data?
+    ) {
+        self.urlPath = urlPath
+        self.method = method
+        self.additionalHeaders = additionalHeaders
+        self.parameters = parameters
+        self.body = body
+    }
+}
+
+public protocol HTTPSessionInterface: URLSessionDelegate {
     var configuration: Configuration { get set }
     var request: Request { get set }
     weak var session: URLSession? { get set }
@@ -34,41 +55,6 @@ public protocol HTTPSessionInterface: URLSessionDelegate {
     func start() throws
     func cancel()
     func dataTaskCallback() -> DataTaskCallback
-}
-
-extension HTTPSessionInterface {
-    
-    public func start() throws {
-        var urlRequest = try configuration.request(path: request.urlPath, parameters: request.parameters)
-
-        urlRequest.httpMethod = request.method.rawValue
-        urlRequest.httpBody = request.body
-        
-        if session == nil {
-            session = sessionProvider?.session(for: urlRequest) ?? URLSession(
-                configuration: configuration.sessionConfiguration,
-                delegate: self,
-                delegateQueue: nil
-            )
-        }
-        
-        session?.dataTask(with: urlRequest, completionHandler: dataTaskCallback()).resume()
-    }
-    
-    public func cancel() {
-        if let session = session {
-            session.invalidateAndCancel()
-            completion(HTTPURLResponse(), nil, .taskCancelled, false)
-        }
-    }
-}
-
-public struct Request {
-    public var urlPath: String
-    public var method: HTTPMethod
-    public var additionalHeaders: [String: String]
-    public var parameters: [String: String]?
-    public var body: Data?
 }
 
 public class HTTPSession: NSObject, HTTPSessionInterface {
@@ -82,8 +68,6 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
     public required init(
         urlPath: String,
         method: HTTPMethod = .get,
-        parameters: [String: String]? = nil,
-        body: Data? = nil,
         configuration: Configuration,
         session: URLSession? = nil,
         completion: @escaping ResponseCallback
@@ -92,12 +76,74 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
             urlPath: urlPath,
             method: method,
             additionalHeaders: [:],
-            parameters: parameters,
-            body: body
+            parameters: nil,
+            body: nil
         )
         self.configuration = configuration
         self.session = session
         self.completion = completion
+    }
+    
+    public func start() throws {
+        let url = try generateUrl()
+        let urlRequest = generateUrlRequest(url: url)
+        
+        if session == nil {
+            session = generateSession(request: urlRequest)
+        }
+        
+        session?.dataTask(with: urlRequest, completionHandler: dataTaskCallback()).resume()
+    }
+    
+    public func cancel() {
+        if let session = session {
+            session.invalidateAndCancel()
+            completion(HTTPURLResponse(), nil, .taskCancelled, false)
+        }
+    }
+    
+    func generateUrl() throws -> URL {
+        var additionalPath = request.urlPath
+        
+        if additionalPath.first != "/" {
+            additionalPath.insert("/", at: additionalPath.startIndex)
+        }
+        
+        guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
+            throw InvalidBaseUrl()
+        }
+        
+        components.path = configuration.baseUrl.path + additionalPath
+        
+        if let parameters = request.parameters, !parameters.isEmpty {
+            components.queryItems = parameters.flatMap(URLQueryItem.init)
+        }
+        
+        guard let requestUrl = components.url else {
+            throw UrlConstructionError()
+        }
+        
+        return requestUrl
+    }
+    
+    func generateUrlRequest(url: URL) -> URLRequest {
+        var urlRequest = URLRequest(url: url)
+        
+        urlRequest.httpMethod = request.method.rawValue
+        urlRequest.httpBody = request.body
+        
+        configuration.httpHeaders.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
+        request.additionalHeaders.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
+        
+        return urlRequest
+    }
+    
+    func generateSession(request: URLRequest) -> URLSession {
+        return sessionProvider?.session(for: request) ?? URLSession(
+            configuration: configuration.sessionConfiguration,
+            delegate: self,
+            delegateQueue: nil
+        )
     }
     
     public func dataTaskCallback() -> (Data?, URLResponse?, Error?) -> Void {
@@ -126,29 +172,29 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         _ session: URLSession,
         didReceive challenge: URLAuthenticationChallenge,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-    ) {
+        ) {
         
         /*
          For reference: https://github.com/iSECPartners/ssl-conservatory
          */
         
         switch challenge.protectionSpace.authenticationMethod {
-            case NSURLAuthenticationMethodServerTrust:
-                let trust = challenge.protectionSpace.serverTrust!
-                let hostname = challenge.protectionSpace.host as CFString
-                
-                guard isCertificateChainValid(with: trust) else {
-                    completionHandler(.cancelAuthenticationChallenge, nil)
-                    return
-                }
-                
-                if configuration.sslPinningMode == .certificate {
-                    verifyWithPinnedCertificates(trust, hostname: hostname, completionHandler: completionHandler)
-                } else {
-                    completionHandler(.useCredential, URLCredential(trust: trust))
-                }
-            default:
-                completionHandler(.performDefaultHandling, nil)
+        case NSURLAuthenticationMethodServerTrust:
+            let trust = challenge.protectionSpace.serverTrust!
+            let hostname = challenge.protectionSpace.host as CFString
+            
+            guard isCertificateChainValid(with: trust) else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            
+            if configuration.sslPinningMode == .certificate {
+                verifyWithPinnedCertificates(trust, hostname: hostname, completionHandler: completionHandler)
+            } else {
+                completionHandler(.useCredential, URLCredential(trust: trust))
+            }
+        default:
+            completionHandler(.performDefaultHandling, nil)
         }
     }
     
@@ -168,7 +214,7 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         _ trust: SecTrust,
         hostname: CFString,
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-    ) {
+        ) {
         guard let pinnedCertificates = configuration.pinnedCertificates else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
@@ -189,7 +235,7 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
     private func isLeafCertificateMatchingAnyPinnedCertificates(
         from serverTrust: SecTrust,
         with pinnedCertificates: [Data]
-    ) -> Bool {
+        ) -> Bool {
         let leafCertificate = SecCertificateCopyData(SecTrustGetCertificateAtIndex(serverTrust, 0)!) as NSData as Data
         return pinnedCertificates.contains(leafCertificate)
     }

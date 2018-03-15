@@ -1,5 +1,5 @@
 //
-//  ErrorHandling.swift
+//  Errors.swift
 //  MDCNetworking
 //
 //  Created by Despotovic, Mladen on 15/12/2016.
@@ -7,6 +7,12 @@
 //
 
 import Foundation
+
+public struct UrlGenerationError: Error {}
+public struct UrlResponseGenerationError: Error {}
+public struct InvalidBaseUrl: Error {}
+public struct UrlConstructionError: Error {}
+public struct PathPercentEncodingError: Error {}
 
 public enum NetworkError: Error {
 

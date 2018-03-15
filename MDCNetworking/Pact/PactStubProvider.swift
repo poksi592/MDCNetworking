@@ -17,36 +17,24 @@ import Foundation
  */
 open class PactSessionProvider {
     
-    public struct UrlGenerationError: Error {}
-    public struct UrlResponseGenerationError: Error {}
-    
-    private let schema: String
-    private let host: String
+    private let baseURL: URL
     private let requestHeaders: [String: String]
     private let responseHeaders: [String: String]
     
     public private (set) var pact: Pact!
     
     public init(
-        schema: String,
-        host: String,
+        baseURL: URL,
         requestHeaders: [String: String] = ["Content-Type": "application/json; charset=UTF-8"],
         responseHeaders: [String: String] = ["Content-Type": "application/json; charset=UTF-8"],
         pactVersion: String,
         providerName: String,
         consumerName: String
     ) {
-        self.host = host
-        self.schema = schema
+        self.baseURL = baseURL
         self.requestHeaders = requestHeaders
         self.responseHeaders = responseHeaders
-        
-        pact = Pact(
-            providerName: providerName,
-            consumerName: consumerName,
-            interactions: [],
-            version: pactVersion
-        )
+        self.pact = Pact(providerName: providerName, consumerName: consumerName, interactions: [], version: pactVersion)
     }
     
     /**
@@ -61,9 +49,20 @@ open class PactSessionProvider {
         responseStatus: Int,
         responseBody: Any? = nil
     ) throws {
+        var additionalPath = path
         
-        guard let url = URL(schema: schema, host: host, path: path, parameters: parameters) else {
-            throw UrlGenerationError()
+        if additionalPath.first != "/" {
+            additionalPath.insert("/", at: additionalPath.startIndex)
+        }
+        
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true) else {
+            throw InvalidBaseUrl()
+        }
+        
+        components.path = baseURL.path + additionalPath
+        
+        guard let url = components.url else {
+            throw UrlConstructionError()
         }
         
         guard
@@ -110,4 +109,3 @@ extension PactSessionProvider: URLSessionProvider {
         return PactStubbedURLSession(response: responseData, urlResponse: interaction.response.urlResponse)
     }
 }
-
