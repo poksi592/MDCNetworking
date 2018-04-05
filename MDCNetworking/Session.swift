@@ -48,7 +48,7 @@ public struct Request {
 public protocol HTTPSessionInterface: URLSessionDelegate {
     var configuration: Configuration { get set }
     var request: Request { get set }
-    weak var session: URLSession? { get set }
+    var session: URLSession? { get set }
     var sessionProvider: URLSessionProvider? { get set }
     var completion: ResponseCallback { get set }
     
