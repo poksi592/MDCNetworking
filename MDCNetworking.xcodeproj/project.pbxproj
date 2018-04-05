@@ -458,6 +458,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
 				SWIFT_VERSION = 4.0;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
