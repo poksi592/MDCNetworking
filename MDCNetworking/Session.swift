@@ -116,7 +116,7 @@ public class HTTPSession: NSObject, HTTPSessionInterface {
         components.path = configuration.baseUrl.path + additionalPath
         
         if let parameters = request.parameters, !parameters.isEmpty {
-            components.queryItems = parameters.flatMap(URLQueryItem.init)
+            components.queryItems = parameters.compactMap(URLQueryItem.init)
         }
         
         guard let requestUrl = components.url else {
