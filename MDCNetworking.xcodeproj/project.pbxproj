@@ -15,7 +15,7 @@
 		6D398AFC1E254B7F005A67E7 /* Test1.json in Resources */ = {isa = PBXBuildFile; fileRef = 6D398AFB1E254B7F005A67E7 /* Test1.json */; };
 		6DA77EF51E02FEA800D3E3B1 /* MDCNetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DA77EEB1E02FEA800D3E3B1 /* MDCNetworking.framework */; };
 		6DA77EFC1E02FEA800D3E3B1 /* MDCNetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */; };
+		6DA77F061E02FEC200D3E3B1 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F051E02FEC200D3E3B1 /* Errors.swift */; };
 		6DA77F081E0404B300D3E3B1 /* NetworkingErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F071E0404B300D3E3B1 /* NetworkingErrorTests.swift */; };
 		6DA77F0A1E07E06E00D3E3B1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F091E07E06E00D3E3B1 /* Configuration.swift */; };
 		6DA77F0C1E07F81E00D3E3B1 /* ConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77F0B1E07F81E00D3E3B1 /* ConfigurationTests.swift */; };
@@ -52,7 +52,7 @@
 		6DA77EEF1E02FEA800D3E3B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6DA77EF41E02FEA800D3E3B1 /* MDCNetworkingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MDCNetworkingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DA77EFB1E02FEA800D3E3B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
+		6DA77F051E02FEC200D3E3B1 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		6DA77F071E0404B300D3E3B1 /* NetworkingErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingErrorTests.swift; sourceTree = "<group>"; };
 		6DA77F091E07E06E00D3E3B1 /* Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		6DA77F0B1E07F81E00D3E3B1 /* ConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
@@ -120,7 +120,7 @@
 				60300C44200F78C800AF7A0A /* Pact */,
 				6DA77EEE1E02FEA800D3E3B1 /* MDCNetworking.h */,
 				6DA77EEF1E02FEA800D3E3B1 /* Info.plist */,
-				6DA77F051E02FEC200D3E3B1 /* ErrorHandling.swift */,
+				6DA77F051E02FEC200D3E3B1 /* Errors.swift */,
 				6DA77F091E07E06E00D3E3B1 /* Configuration.swift */,
 				6DA77F0F1E0802B500D3E3B1 /* NetworkClient.swift */,
 				6DA77F111E08250400D3E3B1 /* Session.swift */,
@@ -210,11 +210,12 @@
 				TargetAttributes = {
 					6DA77EEA1E02FEA800D3E3B1 = {
 						CreatedOnToolsVersion = 8.1;
-						LastSwiftMigration = 0810;
+						LastSwiftMigration = 0930;
 						ProvisioningStyle = Automatic;
 					};
 					6DA77EF31E02FEA800D3E3B1 = {
 						CreatedOnToolsVersion = 8.1;
+						LastSwiftMigration = 0930;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -267,7 +268,7 @@
 				60300C4C200F7A1E00AF7A0A /* URL+Utilities.swift in Sources */,
 				6DA77F121E08250400D3E3B1 /* Session.swift in Sources */,
 				6DA77F0A1E07E06E00D3E3B1 /* Configuration.swift in Sources */,
-				6DA77F061E02FEC200D3E3B1 /* ErrorHandling.swift in Sources */,
+				6DA77F061E02FEC200D3E3B1 /* Errors.swift in Sources */,
 				60300C46200F78DD00AF7A0A /* Pact.swift in Sources */,
 				6DA77F101E0802B500D3E3B1 /* NetworkClient.swift in Sources */,
 				609E824A2016004F004B7A7C /* PactStubProvider.swift in Sources */,
@@ -308,15 +309,24 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -361,15 +371,24 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -416,7 +435,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 			};
 			name = Debug;
@@ -437,7 +457,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = MDC.MDCNetworking;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Release;
@@ -450,7 +472,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = MDC.MDCNetworkingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -462,7 +485,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = MDC.MDCNetworkingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

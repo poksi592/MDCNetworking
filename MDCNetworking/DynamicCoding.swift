@@ -131,26 +131,33 @@ public extension KeyedDecodingContainer where Key == DynamicKey {
                 dict[key.stringValue] = value
             } else if let value = try? decode(Bool.self, forKey: key) {
                 dict[key.stringValue] = value
-            } else if let value = try? decode(Int.self, forKey: key) {
-                dict[key.stringValue] = value
-            } else if let value = try? decode([Any].self, forKey: key) {
-                dict[key.stringValue] = value
-            } else if let value = try? decode([String: Any].self, forKey: key) {
-                dict[key.stringValue] = value
+            } else if var container = try? nestedUnkeyedContainer(forKey: key) {
+                dict[key.stringValue] = container.decodeDynamicValues(floatingPointStrategy: strategy)
+            } else if let container = try? nestedContainer(keyedBy: DynamicKey.self, forKey: key) {
+                dict[key.stringValue] = container.decodeDynamicKeyValues(floatingPointStrategy: strategy)
             } else {
+                var wasNumberDecoded = false
+
                 switch strategy {
                     case .decimal:
                         if let value = try? decode(Decimal.self, forKey: key) {
                             dict[key.stringValue] = value
+                            wasNumberDecoded = true
                         }
                     case .double:
                         if let value = try? decode(Double.self, forKey: key) {
                             dict[key.stringValue] = value
+                            wasNumberDecoded = true
                         }
                     case .float:
                         if let value = try? decode(Float.self, forKey: key) {
                             dict[key.stringValue] = value
+                            wasNumberDecoded = true
                         }
+                }
+
+                if !wasNumberDecoded, let value = try? decode(Int.self, forKey: key) {
+                    dict[key.stringValue] = value
                 }
             }
         }
@@ -158,3 +165,53 @@ public extension KeyedDecodingContainer where Key == DynamicKey {
         return dict
     }
 }
+
+public extension UnkeyedDecodingContainer {
+
+    mutating func decodeDynamicValues(floatingPointStrategy strategy: FloatingPointDecodingStrategy) -> [Any] {
+        var array = [Any]()
+
+        guard let count = count else {
+            return array
+        }
+
+        while currentIndex < count {
+            if let value = try? decode(String.self) {
+                array.append(value)
+            } else if let value = try? decode(Bool.self) {
+                array.append(value)
+            } else if var container = try? nestedUnkeyedContainer() {
+                array.append(container.decodeDynamicValues(floatingPointStrategy: strategy))
+            } else if let container = try? nestedContainer(keyedBy: DynamicKey.self) {
+                array.append(container.decodeDynamicKeyValues(floatingPointStrategy: strategy))
+            } else {
+                var wasNumberDecoded = false
+
+                switch strategy {
+                case .decimal:
+                    if let value = try? decode(Decimal.self) {
+                        array.append(value)
+                        wasNumberDecoded = true
+                    }
+                case .double:
+                    if let value = try? decode(Double.self) {
+                        array.append(value)
+                        wasNumberDecoded = true
+                    }
+                case .float:
+                    if let value = try? decode(Float.self) {
+                        array.append(value)
+                        wasNumberDecoded = true
+                    }
+                }
+
+                if !wasNumberDecoded, let value = try? decode(Int.self) {
+                    array.append(value)
+                }
+            }
+        }
+
+        return array
+    }
+}
+
