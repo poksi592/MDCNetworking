@@ -71,7 +71,7 @@ public struct Request {
     public var body: Data?
 }
 
-public class HTTPSession: NSObject, HTTPSessionInterface {
+public class HTTPJSONSession: NSObject, HTTPSessionInterface {
     
     public var completion: ResponseCallback
     public var configuration: Configuration

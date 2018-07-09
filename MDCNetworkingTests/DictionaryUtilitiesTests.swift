@@ -33,10 +33,10 @@ class DictionaryUtilitiesTests: XCTestCase {
         string = parameters.URLParameters()
         XCTAssertEqual(string, "key=value")
         
-        // Two parameters
+        // Two parameters, we don't have control over order sequence in result
         parameters = ["key": "value","key1": "value"]
         string = parameters.URLParameters()
-        XCTAssertEqual(string, "key=value&key1=value")
+        XCTAssertTrue(string == "key=value&key1=value" || string == "key1=value&key=value")
         
         // Remove % encodings if it exist and add again
         parameters = ["one%26two": "%20%3Dthree"]

@@ -15,7 +15,7 @@ class SessionTests: XCTestCase {
     
         // Test with default GET method
         let configuration = try? Configuration(scheme: "http", host: "api.timezonedb.com")
-        let session1 = HTTPSession(
+        let session1 = HTTPJSONSession(
             urlPath: "https://somehost",
             configuration: configuration!
         ) { _, _, _, _ in }
@@ -36,7 +36,7 @@ class SessionTests: XCTestCase {
         let parameters = ["key": "1S2RMN6YBMYA", "country": "GB", "format": "json"]
         
         // Execute and test
-        let session1 = HTTPSession(
+        let session1 = HTTPJSONSession(
             urlPath: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
@@ -81,7 +81,7 @@ class SessionTests: XCTestCase {
         )
         
         // Execute and test
-        let session1 = HTTPSession(
+        let session1 = HTTPJSONSession(
             urlPath: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
@@ -132,7 +132,7 @@ class SessionTests: XCTestCase {
         )
         
         // Execute and test
-        let session1 = HTTPSession(
+        let session1 = HTTPJSONSession(
             urlPath: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
@@ -179,7 +179,7 @@ class SessionTests: XCTestCase {
         )
         
         // Execute and test
-        let session1 = HTTPSession(
+        let session1 = HTTPJSONSession(
             urlPath: "/v2/list-time-zone",
             method: .get,
             parameters: parameters,
