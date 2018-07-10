@@ -75,10 +75,12 @@ class SessionTests: XCTestCase {
         // Prepare stubbed session
         let stubbedSession = StubbedURLSession()
         let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
-        stubbedSession.addStub(
-            fullURL: "http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json&country=GB",
-            response: responseString
-        )
+        
+        stubbedSession.addStub(schema: "http",
+                               host: "api.timezonedb.com",
+                               path: "/v2/list-time-zone",
+                               parameters: parameters,
+                               response: responseString)
         
         // Execute and test
         let session1 = HTTPJSONSession(
@@ -121,15 +123,18 @@ class SessionTests: XCTestCase {
         // Prepare stubbed session
         let stubbedSession = StubbedURLSession()
         let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
-        stubbedSession.addStub(
-            fullURL: "http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json&country=GB",
-            response: responseString
-        )
+        stubbedSession.addStub(schema: "http",
+                               host: "api.timezonedb.com",
+                               path: "/v2/list-time-zone",
+                               parameters: parameters,
+                               response: responseString)
+        
         // Stubbed session with one missing parameter, therefore not valid
-        stubbedSession.addStub(
-            fullURL: "http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json",
-            response: responseString
-        )
+        stubbedSession.addStub(schema: "http",
+                               host: "api.timezonedb.com",
+                               path: "/v2/list-time-zone",
+                               parameters: ["key": "1S2RMN6YBMYA", "format": "json"],
+                               response: responseString)
         
         // Execute and test
         let session1 = HTTPJSONSession(

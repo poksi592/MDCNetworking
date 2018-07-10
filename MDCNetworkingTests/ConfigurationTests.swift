@@ -65,6 +65,7 @@ class ConfigurationTests: XCTestCase {
         session = try? Configuration(scheme: "https", host: "somehost")
         request = try! session!.request(path: "/path", parameters: ["parameter": "value", "parameter1": "value1"])
         
-        XCTAssertEqual(request.description, "https://somehost/path?parameter=value&parameter1=value1")
+        // order of parameters is not guaranteed
+        XCTAssertTrue(request.description == "https://somehost/path?parameter=value&parameter1=value1" || request.description == "https://somehost/path?parameter1=value1&parameter=value")
     }
 }

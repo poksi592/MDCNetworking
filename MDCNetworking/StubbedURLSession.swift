@@ -45,6 +45,23 @@ public class StubbedURLSession: URLSession {
         stubbedResponses[fullURL] = response
     }
     
+    // MARK Safer overload of the 'addStub' above, because it creates URL in the same way
+    // and makes the order of parameters in URL same
+    func addStub(schema: String,
+                 host: String,
+                 path: String,
+                 parameters: [String: String]?,
+                 response: String) {
+        
+        if let fullUrl = URL(schema: schema,
+                          host: host,
+                          path: path,
+                          parameters: parameters) {
+            
+            stubbedResponses[fullUrl.absoluteString] = response
+        }
+    }
+    
     func removeStubs() {
         
         stubbedResponses = [:]
