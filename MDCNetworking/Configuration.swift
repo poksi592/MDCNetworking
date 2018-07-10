@@ -15,9 +15,6 @@ public enum SSLPinningMode {
 
 public struct Configuration {
     
-    public struct InvalidSchemeOrHost: Error {}
-    public struct UrlConstructionError: Error {}
-
     let baseUrl: URL
     let additionalHeaders: [String: String]
     let timeout: TimeInterval
