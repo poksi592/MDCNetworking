@@ -51,4 +51,11 @@ public enum NetworkError: Error {
     }
 }
 
+public enum ConfigurationError: Error {
+    
+    case invalidSchemeOrHost
+    case urlConstructionFailed
+}
+
+
 

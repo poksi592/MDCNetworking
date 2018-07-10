@@ -17,7 +17,6 @@ public struct Configuration {
     
     public struct InvalidSchemeOrHost: Error {}
     public struct UrlConstructionError: Error {}
-    public struct PathPercentEncodingError: Error {}
 
     let baseUrl: URL
     let additionalHeaders: [String: String]
@@ -42,7 +41,7 @@ public struct Configuration {
         components.host = host
         
         guard let baseUrl = components.url else {
-            throw InvalidSchemeOrHost()
+            throw ConfigurationError.invalidSchemeOrHost
         }
         
         self.baseUrl = baseUrl
@@ -68,7 +67,7 @@ public struct Configuration {
         }
 
         guard let requestUrl = components.url else {
-            throw UrlConstructionError()
+            throw ConfigurationError.urlConstructionFailed
         }
         
         var request = URLRequest(url: requestUrl)

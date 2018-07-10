@@ -10,8 +10,8 @@ import Foundation
 
 open class NetworkClient {
 
-    open let configuration: Configuration
-    open let sessionProvider: URLSessionProvider?
+    public let configuration: Configuration
+    public let sessionProvider: URLSessionProvider?
     
     public init(configuration: Configuration, sessionProvider: URLSessionProvider?) {
         self.configuration = configuration
