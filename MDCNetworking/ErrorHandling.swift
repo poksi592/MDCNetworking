@@ -20,7 +20,7 @@ public enum NetworkError: Error {
     case serverError500(error: Error?, response: HTTPURLResponse?, payload: Data?)
     case other
     
-    init?(error: Error?, response: HTTPURLResponse?, payload: Data?) {
+    public init?(error: Error?, response: HTTPURLResponse?, payload: Data?) {
         
         let responseCode: Int
         if let response = response {
