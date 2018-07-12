@@ -15,12 +15,12 @@ public enum SSLPinningMode {
 
 public struct Configuration {
     
-    let baseUrl: URL
-    let additionalHeaders: [String: String]
-    let timeout: TimeInterval
-    let sessionConfiguration: URLSessionConfiguration
-    let sslPinningMode: SSLPinningMode
-    let pinnedCertificates: [Data]?
+    public let baseUrl: URL
+    public let additionalHeaders: [String: String]
+    public let timeout: TimeInterval
+    public let sessionConfiguration: URLSessionConfiguration
+    public let sslPinningMode: SSLPinningMode
+    public let pinnedCertificates: [Data]?
 
     public init(
         scheme: String,
