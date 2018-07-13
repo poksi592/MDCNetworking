@@ -8,23 +8,25 @@
 
 import Foundation
 
+/**
+ StubbedURLSession provides possibility to be either used as a stubbed session directly in
+ `NetworkClient.session(...)` function, or it can be used as an `URLSessionProvider`
+ and thus implementing more possibilities
+ 
+ It can be used as an out of the box solution to stub the responses matching certain requests,
+ or developers can create their separate implementation of `URLSessionProvider` and its sole
+ function `session(for urlRequest: URLRequest) -> URLSession?`
+ */
 public class StubbedURLSession: URLSession {
-    
-    public var stubbedResponses: [String: String] = [:]
+
+    public var stubbedResponses = [URLRequest: Dictionary<HTTPURLResponse, Data>]()
     
     override public func dataTask(with: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        
-        let filteredResponses = stubbedResponses.filter { (response) in
+
+        if let response = stubbedResponses[with],
+            let responseAndData = response.first {
             
-            guard let stubbedURL = URL(string: response.key) else {
-                return false
-            }
-            return URLRequest(url: stubbedURL) == with
-        }
-        
-        if let firstResponse = filteredResponses.first?.value  {
-            
-            completionHandler(firstResponse.data(using: .utf8), nil, nil)
+            completionHandler(responseAndData.value, responseAndData.key, nil)
         }
         else {
             
@@ -33,16 +35,11 @@ public class StubbedURLSession: URLSession {
                                                                     httpVersion: nil,
                                                                     headerFields: nil)
             completionHandler(nil, mockedResponse, NetworkError(error: nil,
-                                                     response: mockedResponse,
-                                                     payload: nil))
+                                                                response: mockedResponse,
+                                                                payload: nil))
         }
 
         return MockURLSessionDataTask()
-    }
-    
-    func addStub(fullURL: String, response: String) {
-        
-        stubbedResponses[fullURL] = response
     }
     
     // MARK Safer overload of the 'addStub' above, because it creates URL in the same way
@@ -51,14 +48,22 @@ public class StubbedURLSession: URLSession {
                  host: String,
                  path: String,
                  parameters: [String: String]?,
-                 response: String) {
+                 headerFields: [String: String]?,
+                 response: String,
+                 responseStatusCode: Int) {
         
         if let fullUrl = URL(schema: schema,
                           host: host,
                           path: path,
-                          parameters: parameters) {
+                          parameters: parameters),
+            let urlResponse = HTTPURLResponse(url: fullUrl,
+                                              statusCode: responseStatusCode,
+                                              httpVersion: nil,
+                                              headerFields: headerFields),
+            let response = response.data(using: .utf8) {
             
-            stubbedResponses[fullUrl.absoluteString] = response
+            let urlRequest = URLRequest(url: fullUrl)
+            stubbedResponses[urlRequest] = [urlResponse: response]
         }
     }
     
@@ -67,6 +72,17 @@ public class StubbedURLSession: URLSession {
         stubbedResponses = [:]
     }
         
+}
+
+extension StubbedURLSession: URLSessionProvider {
+    
+    public func session(for urlRequest: URLRequest) -> URLSession? {
+        
+        if let _ = stubbedResponses[urlRequest] {
+            return self
+        }
+        return nil
+    }
 }
 
 fileprivate class MockURLSessionDataTask: URLSessionDataTask {

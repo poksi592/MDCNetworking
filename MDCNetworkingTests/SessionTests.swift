@@ -80,7 +80,9 @@ class SessionTests: XCTestCase {
                                host: "api.timezonedb.com",
                                path: "/v2/list-time-zone",
                                parameters: parameters,
-                               response: responseString)
+                               headerFields: nil,
+                               response: responseString,
+                               responseStatusCode: 200)
         
         // Execute and test
         let session1 = HTTPJSONSession(
@@ -123,18 +125,23 @@ class SessionTests: XCTestCase {
         // Prepare stubbed session
         let stubbedSession = StubbedURLSession()
         let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
+        
         stubbedSession.addStub(schema: "http",
                                host: "api.timezonedb.com",
                                path: "/v2/list-time-zone",
                                parameters: parameters,
-                               response: responseString)
+                               headerFields: nil,
+                               response: responseString,
+                               responseStatusCode: 200)
         
         // Stubbed session with one missing parameter, therefore not valid
         stubbedSession.addStub(schema: "http",
                                host: "api.timezonedb.com",
                                path: "/v2/list-time-zone",
                                parameters: ["key": "1S2RMN6YBMYA", "format": "json"],
-                               response: responseString)
+                               headerFields: nil,
+                               response: responseString,
+                               responseStatusCode: 200)
         
         // Execute and test
         let session1 = HTTPJSONSession(
@@ -177,11 +184,14 @@ class SessionTests: XCTestCase {
         // Prepare stubbed session
         let stubbedSession = StubbedURLSession()
         let responseString = "{\n \"zones\":[{\"countryCode\":\"UK\"}] \n}"
-        // Stubbed session with one missing parameter, therefore not valid
-        stubbedSession.addStub(
-            fullURL: "http://api.timezonedb.com/v2/list-time-zone?key=1S2RMN6YBMYA&format=json",
-            response: responseString
-        )
+        // Stubbed session with one missing parameter, therefore not valid        
+        stubbedSession.addStub(schema: "http",
+                               host: "api.timezonedb.com",
+                               path: "/v2/list-time-zone",
+                               parameters: ["key": "1S2RMN6YBMYA", "format": "json"],
+                               headerFields: nil,
+                               response: responseString,
+                               responseStatusCode: 200)
         
         // Execute and test
         let session1 = HTTPJSONSession(
@@ -193,12 +203,6 @@ class SessionTests: XCTestCase {
         ) { _, _, error, wasCancelled in
                                     
             XCTAssertNotNil(error)
-
-            guard case .badRequest400 = error! else {
-                XCTAssertTrue(false, "error")
-                return
-            }
-            
             expectationForTest.fulfill()
         }
         
