@@ -60,7 +60,7 @@ public struct Configuration {
         components.path = path
         
         if let parameters = parameters {
-            components.queryItems = parameters.flatMap(URLQueryItem.init)
+            components.queryItems = parameters.compactMap(URLQueryItem.init)
         }
 
         guard let requestUrl = components.url else {
