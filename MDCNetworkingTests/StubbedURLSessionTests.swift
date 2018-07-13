@@ -156,5 +156,4 @@ class StubbedURLSessionTests: XCTestCase {
         try? session.start()
         waitForExpectations(timeout: 5, handler: nil)
     }
-    
 }

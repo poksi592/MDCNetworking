@@ -44,7 +44,7 @@ public class StubbedURLSession: URLSession {
     
     // MARK Safer overload of the 'addStub' above, because it creates URL in the same way
     // and makes the order of parameters in URL same
-    func addStub(schema: String,
+    public func addStub(schema: String,
                  host: String,
                  path: String,
                  parameters: [String: String]?,
@@ -67,7 +67,7 @@ public class StubbedURLSession: URLSession {
         }
     }
     
-    func removeStubs() {
+    public func removeStubs() {
         
         stubbedResponses = [:]
     }
